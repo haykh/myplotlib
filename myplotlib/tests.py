@@ -38,8 +38,8 @@ def testErrorbar(ax=None):
   x = np.linspace(0, 1000, 10)
   y = np.sin(x / 100)
   dy = np.random.random(len(x)) * (y + 1.5) / 3
-  pl.__genericXYDataPlot(ax.errorbar, ax, x, y, yerr=dy, pady=2, 
-                         marker='o', markeredgecolor='w', markerfacecolor='C11', markeredgewidth=1.5)
+  pl.dataPlot(ax.errorbar, ax, x, y, yerr=dy, pady=2, 
+              marker='o', markeredgecolor='w', markerfacecolor='C11', markeredgewidth=1.5)
   ax.set_xlabel('time [s]')
   ax.set_ylabel('my very accurately measured variable [ly]')
   

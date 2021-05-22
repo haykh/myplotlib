@@ -1,3 +1,16 @@
+"""
+`myplotlib.plots`
+
+a collection of handy plotting functions bound around `matplotlib` with lots of nice perks.
+
+* dataPlot .................. : plot generic x & y 1d data (pass an `ax` method)
+* scatter ................... : scatter plot (`dataPlot` with `ax.scatter`)
+* plot ...................... : regular plot (`dataPlot` with `ax.plot`)
+* plot2d .................... : 2d plot using `imshow`
+
+docstrings are available for all of the functions. type, e.g., `dataPlot?` to read about the arguments passed.
+"""
+
 import numpy as np
 
 def __stretch(left, right, pad):
@@ -33,16 +46,6 @@ def __setAxLims(ax, coords, log, pad, lim, spines):
     p1, p2 = lim
     func_setlim(*__stretch(p1, p2, pad))
 
-def __genericXYDataPlot(function, ax,
-                        x, y, 
-                        xlog=False, ylog=False, 
-                        xlim=None, ylim=None,
-                        padx=1.1, pady=1.1, 
-                        **kwargs):
-  function(x, y, **kwargs);
-  __setAxLims(ax, x, xlog, padx, xlim, 'bottom')
-  __setAxLims(ax, y, ylog, pady, ylim, 'left')
-
 def __checkDimensions2d(x, y, zz):
   x, y, zz = (np.array(np.squeeze(x)), np.array(np.squeeze(y)), np.array(np.squeeze(zz)))
   readShapes = f"`x.shape={x.shape}`, `y.shape={y.shape}`, `zz.shape={zz.shape}`"
@@ -63,12 +66,35 @@ def __findExtent(x, y, centering):
     raise ValueError
   return extent
 
+def dataPlot(function, ax,
+             x, y, 
+             xlog=False, ylog=False, 
+             xlim=None, ylim=None,
+             padx=1.1, pady=1.1, 
+             **kwargs):
+  """
+  add a plot according to a passed function 
+
+  args
+  ----------
+  function .................... : `ax.<METHOD>` used to make the plot (e.g. `ax.step`, `ax.errorbar`)
+  ax .......................... : matplotlib axis object
+  x, y ........................ : 1d data arrays
+  xlog [False], ylog [False] .. : use log in x or y direction
+  xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from data)
+  padx [1.1], pady [1.1] ...... : add whitespace to axes in each direction (1 = no additional space)
+  **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
+  """
+  function(x, y, **kwargs);
+  __setAxLims(ax, x, xlog, padx, xlim, 'bottom')
+  __setAxLims(ax, y, ylog, pady, ylim, 'left')
+
 def scatter(ax, x, y, 
             xlog=False, ylog=False, 
             xlim=None, ylim=None,
             padx=1.1, pady=1.1, **kwargs):
   """
-  add a scatter plot to a given axis
+  add a scatter plot to a given axis (same as `dataPlot(ax.scatter, ...)`)
 
   args
   ----------
@@ -79,14 +105,14 @@ def scatter(ax, x, y,
   padx [1.1], pady [1.1] ...... : add whitespace to axes in each direction (1 = no additional space)
   **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
   """
-  __genericXYDataPlot(ax.scatter, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
+  dataPlot(ax.scatter, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
     
 def plot(ax, x, y, 
          xlog=False, ylog=False, 
          xlim=None, ylim=None,
          padx=1.1, pady=1.1, **kwargs):
   """
-  add a simple plot to a given axis
+  add a simple plot to a given axis (same as `dataPlot(ax.plot, ...)`)
 
   args
   ----------
@@ -97,7 +123,7 @@ def plot(ax, x, y,
   padx [1.1], pady [1.1] ...... : add whitespace to axes in each direction (1 = no additional space)
   **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
   """
-  __genericXYDataPlot(ax.plot, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
+  dataPlot(ax.plot, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
     
 def plot2d(ax, x, y, zz, 
            centering='edge', 
