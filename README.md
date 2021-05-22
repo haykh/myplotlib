@@ -24,3 +24,11 @@ mypl?
 
 * `matplotlib>=3.0.0`, `numpy`, `scipy`
 * `latex` (install separately)
+
+### To-do
+
+- [ ] add streamplot for fieldline plotting 
+- [ ] isocontour plotting
+- [ ] add a test plot for the demo
+- [ ] add image to readme
+- [ ] print all the newly added colormaps and the default color sequence
