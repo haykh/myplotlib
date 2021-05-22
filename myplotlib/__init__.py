@@ -22,10 +22,13 @@ def __InstallCmapFromCSV(csv):
   import matplotlib.pyplot as plt
   cmap = os.path.splitext(os.path.basename(csv))[0]
   cmap_data = np.loadtxt(csv, delimiter=',')
-  mpl_data = __RGBToPyCmap(cmap_data)
-  plt.register_cmap(cmap=mpl.colors.LinearSegmentedColormap(cmap, mpl_data, cmap_data.shape[0]))
-  mpl_data_r = __RGBToPyCmap(cmap_data[::-1,:])
-  plt.register_cmap(cmap=mpl.colors.LinearSegmentedColormap(f'{cmap}_r', mpl_data_r, cmap_data.shape[0]))
+  if cmap not in plt.colormaps():
+    mpl_data = __RGBToPyCmap(cmap_data)
+    plt.register_cmap(cmap=mpl.colors.LinearSegmentedColormap(cmap, mpl_data, cmap_data.shape[0]))
+  cmap = f'{cmap}_r'
+  if cmap not in plt.colormaps():
+    mpl_data_r = __RGBToPyCmap(cmap_data[::-1,:])
+    plt.register_cmap(cmap=mpl.colors.LinearSegmentedColormap(cmap, mpl_data_r, cmap_data.shape[0]))
 
 def load():
   import os
