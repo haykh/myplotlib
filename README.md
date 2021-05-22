@@ -5,7 +5,7 @@
 ### installation
 
 ```shell
-pip install https://github.com/haykh/myplotlib.git@master
+pip install git+https://github.com/haykh/myplotlib.git@master
 ```
 
 ### requirements
