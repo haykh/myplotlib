@@ -1,6 +1,6 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
-__version__ = '0.1'
+__version__ = '0.9'
 
 setup(
     python_requires='>3.6.0',
@@ -15,9 +15,10 @@ setup(
       'matplotlib>=3.0.0',
       'numpy',
       'tqdm',
-      'scipy'
+      'scipy',
+      'numba'
     ],
-    packages=['myplotlib'],
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False
   )

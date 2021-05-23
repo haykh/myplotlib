@@ -9,10 +9,14 @@ commands to help preview the custom styles (function names are self-descriptive)
 * testPlot
 * testErrorbar
 * testPlot2d
+* testVectorPlot2d 
+
+* testAll
 """
 import myplotlib.plots as myplt
 import myplotlib
 
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -109,10 +113,30 @@ def testPlot2d(ax=None):
   ax.set_xlabel('landscape in $x$')
   ax.set_ylabel('landscape in $y$')
 
+def testVectorPlot2d(ax=None):
+  ax = __getAx(ax)
+  vortex_spacing = 0.5
+  extra_factor = 2.
+  a = np.array([1, 0]) * vortex_spacing
+  b = np.array([np.cos(np.pi / 3),np.sin(np.pi / 3)]) * vortex_spacing
+  rnv = int(2 * extra_factor / vortex_spacing)
+  vortices = [n * a + m * b for n in range(-rnv, rnv) for m in range(-rnv, rnv)]
+  vortices = [(x, y) for (x, y) in vortices if -extra_factor < x < extra_factor and -extra_factor < y < extra_factor]
+  sx, sy = (1000, 1000)
+  xs = np.linspace(-1, 1, sx).astype(np.float64)[None,:]
+  ys = np.linspace(-1, 1, sy).astype(np.float64)[:,None]
+  vectors = np.zeros((sx,sy,2),dtype=np.float64)
+  for (x,y) in vortices:
+    rsq = (xs-x)**2 + (ys-y)**2
+    vectors[...,0] +=  (ys-y)/rsq
+    vectors[...,1] += -(xs-x)/rsq
+  myplt.plotVectorField(ax, xs, ys, vectors[:,:,0], vectors[:,:,1],
+                        norm=matplotlib.colors.LogNorm(1, 1e2), cmap='turbo', lic_contrast=1)
+
 def testAll():
   myplotlib.load()
-  fig = plt.figure(figsize=(12, 12))
-  axshape = (3, 2)
+  fig = plt.figure(figsize=(12, 16))
+  axshape = (4, 2)
   axi = 1
 
   ax = plt.subplot(*axshape, axi)
@@ -138,5 +162,12 @@ def testAll():
   ax = plt.subplot(*axshape, axi)
   testPlot2d(ax)
   axi += 1
+
+  ax = plt.subplot(*axshape, axi)
+  testVectorPlot2d(ax)
+  axi += 1
+
+  # ax = plt.subplot(*axshape, axi)
+  # axi += 1
 
   plt.tight_layout()

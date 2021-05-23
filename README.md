@@ -32,7 +32,7 @@ for more usage examples checkout the `tests/` submodule.
 
 ### requirements
 
-* `matplotlib>=3.0.0`, `numpy`, `scipy`
+* `matplotlib>=3.0.0`, `numpy`, `scipy`, `numba`
 * `latex` (install separately)
 
 ### To-do

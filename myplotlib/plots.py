@@ -7,6 +7,7 @@ a collection of handy plotting functions bound around `matplotlib` with lots of 
 * scatter ................... : scatter plot (`dataPlot` with `ax.scatter`)
 * plot ...................... : regular plot (`dataPlot` with `ax.plot`)
 * plot2d .................... : 2d plot using `imshow`
+* plotVectorField ........... : 2d plot with vector field
 
 docstrings are available for all of the functions. type, e.g., `dataPlot?` to read about the arguments passed.
 """
@@ -50,7 +51,9 @@ def __checkDimensions2d(x, y, zz):
   x, y, zz = (np.array(np.squeeze(x)), np.array(np.squeeze(y)), np.array(np.squeeze(zz)))
   readShapes = f"`x.shape={x.shape}`, `y.shape={y.shape}`, `zz.shape={zz.shape}`"
   assert len(x.shape) == len(y.shape), f"Shapes of `x` and `y` must be of the same dimension: {readShapes}."
-  assert len(zz.shape) == 2, f"`zz` must have exactly 2 non-trivial axes: {readShapes}."
+  assert (len(zz.shape) == 2) or\
+          (len(zz.shape) == 3 and ((zz.shape[-1] == 3) or (zz.shape[-1] == 4))),\
+          f"`zz` must have exactly 2 non-trivial axes: {readShapes}."
   assert zz.shape[1] == x.shape[0], f"incompatible dimensions between `x` and `zz`: {readShapes}."
   assert zz.shape[0] == y.shape[0], f"incompatible dimensions between `y` and `zz`: {readShapes}."
   return (x, y, zz)
@@ -157,3 +160,74 @@ def plot2d(ax, x, y, zz,
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size=cbar, pad=cbar_pad)
     plt.colorbar(ax.get_images()[0], cax=cax)
+
+def plotVectorField(ax, x, y, fx, fy, background=None,
+                    texture_seed=None,
+                    kernel_len=31, kernel_pow=1,
+                    lic_alphamin=0.5, lic_alphamax=0.75, lic_contrast=0.33, lic_opacity=0.75,
+                    centering='edge', 
+                    xlim=None, ylim=None, 
+                    padx=1.1, pady=1.1,
+                    cbar='5%', cbar_pad=0.05,
+                    **kwargs):
+  """
+  add a 2d plot with a vector-field overplotted
+
+  args
+  ----------
+  ax .......................... : matplotlib axis object
+  x, y ........................ : 1d or 2d arrays of coordinates
+  fx, fy ...................... : 2d arrays of the vector field components
+  background [None] ........... : 2d array of the image background (None = `sqrt(fx^2 + fy^2)`)
+
+  line integral convolution (lic) parameters
+  ----------
+  texture_seed [None] ......... : specify a random seed to generate textures, useful when rendering movies (None = random)
+  kernel_len [31] ............. : kernel resolution for the lic algorithm
+  kernel_pow [1] .............. : kernel sharpness for the lic algorithm
+  lic_alphamin [0.5] .......... : lic parameter for min transparency
+  lic_alphamax [0.75] ......... : lic parameter for max transparency
+  lic_contrast [0.33] ......... : lic parameter for the contrast
+  lic_opacity [0.75] .......... : lic parameter for the absolute opacity of the field plot
+
+  the rest of the args are the same as for the `plot2d`
+  ----------
+  centering ['edge'] .......... : centering of x & y nodes for the data ('edge', 'center')
+  xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from x & y)
+  padx [1.1], pady [1.1] ...... : add whitespace to axes in each direction (1 = no additional space)
+  cbar ['5%'] ................. : size of the colorbar in percent of x-axis (None = no colorbar) 
+  cbar_pad [0.05] ............. : padding of the colorbar
+  **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
+  """
+  import myplotlib.tools.lic as lic
+  import matplotlib
+  import matplotlib.pyplot as plt
+  kernel = lic.generate_kernel(kernel_len)**kernel_pow
+  x, y, fx = __checkDimensions2d(x, y, fx)
+  x, y, fy = __checkDimensions2d(x, y, fy)
+  if background is None:
+    background = np.sqrt(fx**2 + fy**2)
+  x, y, background = __checkDimensions2d(x, y, background)
+  texture = lic.generate_texture(background.shape, texture_seed)
+  img1 = lic.line_integral_convolution(fx, fy, texture, kernel)
+  img2 = lic.line_integral_convolution(-fx, -fy, texture, kernel)
+  img = 0.5 * (img1 + img2)
+
+  weights = img
+  _ = (np.sign(weights - np.average(weights)) * np.sqrt(np.abs(weights - np.average(weights))))
+  alphas = matplotlib.colors.Normalize(None, None, clip=True)(_)
+  alphas[alphas < lic_alphamin] = 0
+  alphas[alphas > lic_alphamax] = 1
+  _ = (np.sign(weights - np.average(weights)) * np.abs(weights - np.average(weights))**lic_contrast)
+  colors = matplotlib.colors.Normalize(None, None)(_)
+  colors = plt.cm.binary_r(colors)
+  colors[..., -1] = alphas
+
+  plot2d(ax, x, y, background, 
+         centering=centering, xlim=xlim, ylim=ylim, 
+         padx=padx, pady=pady, cbar=cbar, cbar_pad=cbar_pad, **kwargs)
+  plot2d(ax, x, y, colors, 
+         centering=centering, xlim=xlim, ylim=ylim, 
+         padx=padx, pady=pady, cbar=cbar, cbar_pad=cbar_pad, 
+         alpha=lic_opacity)
+  ax.grid(False)
