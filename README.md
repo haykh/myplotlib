@@ -17,9 +17,9 @@ import myplotlib
 # initialize styles:
 myplotlib.load()
 
-import myplotlib.plots as mypl
+import myplotlib.plots as myplt
 # type for docstring:
-mypl? 
+myplt? 
 ```
 
 ### requirements
