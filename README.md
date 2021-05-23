@@ -37,7 +37,7 @@ for more usage examples checkout the `tests/` submodule.
 
 ### To-do
 
-- [ ] add streamplot for fieldline plotting 
+- [x] add streamplot for fieldline plotting 
 - [ ] isocontour plotting
 - [x] print all the newly added colormaps and the default color sequence
 - [x] add a test plot for the demo
