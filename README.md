@@ -1,4 +1,4 @@
-# myplotlib
+# `myplotlib`
 
 `matplotlib` binder with custom styles.
 
@@ -27,6 +27,8 @@ import myplotlib.tests as mypltest
 # type for docstring:
 mypltestA?
 ```
+
+for more usage examples checkout the `tests/` submodule.
 
 ### requirements
 
