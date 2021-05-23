@@ -2,6 +2,8 @@
 
 `matplotlib` binder with custom styles.
 
+![preview](https://github.com/haykh/myplotlib/blob/master/myplotlib/preview.jpg)
+
 ### installation
 
 ```shell

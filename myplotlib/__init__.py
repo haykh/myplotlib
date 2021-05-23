@@ -15,7 +15,10 @@ def __RGBToPyCmap(rgbdata):
               'blue':  bdata}
   return mpl_data
 
+CUSTOM_CMAPS = []
+
 def __InstallCmapFromCSV(csv):
+  global CUSTOM_CMAPS
   import os
   import numpy as np
   import matplotlib as mpl
@@ -23,6 +26,7 @@ def __InstallCmapFromCSV(csv):
   cmap = os.path.splitext(os.path.basename(csv))[0]
   cmap_data = np.loadtxt(csv, delimiter=',')
   if cmap not in plt.colormaps():
+    CUSTOM_CMAPS.append(cmap)
     mpl_data = __RGBToPyCmap(cmap_data)
     plt.register_cmap(cmap=mpl.colors.LinearSegmentedColormap(cmap, mpl_data, cmap_data.shape[0]))
   cmap = f'{cmap}_r'
@@ -38,8 +42,8 @@ def load():
   CMAP_DIR = pkg_resources.resource_filename(__name__, 'assets/colormaps')
   CMAPS = pkg_resources.resource_listdir(__name__, 'assets/colormaps')
   for cmap in CMAPS:
-    __InstallCmapFromCSV(os.path.join(CMAP_DIR, cmap))
-
+    cmapname = os.path.join(CMAP_DIR, cmap)
+    __InstallCmapFromCSV(cmapname)
   FONT_DIR = pkg_resources.resource_filename(__name__, 'assets/fonts')
   font_files = font_manager.findSystemFonts(fontpaths=[FONT_DIR])
   for font_file in font_files:
