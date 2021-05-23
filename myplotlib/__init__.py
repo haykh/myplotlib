@@ -1,3 +1,8 @@
+import pkg_resources
+__version__ = pkg_resources.require(__name__)[0].version
+
+CUSTOM_CMAPS = []
+
 def __RGBToPyCmap(rgbdata):
   import numpy as np
   nsteps = rgbdata.shape[0]
@@ -14,8 +19,6 @@ def __RGBToPyCmap(rgbdata):
               'green': gdata,
               'blue':  bdata}
   return mpl_data
-
-CUSTOM_CMAPS = []
 
 def __InstallCmapFromCSV(csv):
   global CUSTOM_CMAPS
@@ -48,6 +51,5 @@ def load():
   font_files = font_manager.findSystemFonts(fontpaths=[FONT_DIR])
   for font_file in font_files:
     font_manager.fontManager.addfont(font_file)
-
   MPLSTYLE_FILE = pkg_resources.resource_stream(__name__, 'assets/my.mplstyle')
   plt.style.use(MPLSTYLE_FILE.name)
