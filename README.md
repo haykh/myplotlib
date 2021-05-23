@@ -25,7 +25,7 @@ myplt?
 # preview custom styles with built-in functions
 import myplotlib.tests as mypltest
 # type for docstring:
-mypltestA?
+mypltest?
 ```
 
 for more usage examples checkout the `tests/` submodule.
