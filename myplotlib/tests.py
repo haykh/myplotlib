@@ -1,3 +1,15 @@
+"""
+`myplotlib.tests`
+
+commands to help preview the custom styles (function names are self-descriptive). available functions are:
+
+* testColormaps
+* testColors 
+* testScatter
+* testPlot
+* testErrorbar
+* testPlot2d
+"""
 import myplotlib.plots as myplt
 import myplotlib
 

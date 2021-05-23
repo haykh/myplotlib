@@ -13,13 +13,19 @@ pip install git+https://github.com/haykh/myplotlib.git@master
 ### usage
 
 ```python
-import myplotlib
 # initialize styles:
+import myplotlib
 myplotlib.load()
 
+# auxiliary functions for plotting:
 import myplotlib.plots as myplt
 # type for docstring:
 myplt? 
+
+# preview custom styles with built-in functions
+import myplotlib.tests as mypltest
+# type for docstring:
+mypltestA?
 ```
 
 ### requirements
@@ -31,6 +37,6 @@ myplt?
 
 - [ ] add streamplot for fieldline plotting 
 - [ ] isocontour plotting
-- [ ] add a test plot for the demo
-- [ ] add image to readme
-- [ ] print all the newly added colormaps and the default color sequence
+- [x] print all the newly added colormaps and the default color sequence
+- [x] add a test plot for the demo
+- [x] add image to readme
