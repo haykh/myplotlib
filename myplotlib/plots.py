@@ -51,6 +51,10 @@ def __checkDimensions2d(x, y, zz):
   x, y, zz = (np.array(np.squeeze(x)), np.array(np.squeeze(y)), np.array(np.squeeze(zz)))
   readShapes = f"`x.shape={x.shape}`, `y.shape={y.shape}`, `zz.shape={zz.shape}`"
   assert len(x.shape) == len(y.shape), f"Shapes of `x` and `y` must be of the same dimension: {readShapes}."
+  if (len(x.shape) > 1):
+    x = x[0,...]
+  if (len(y.shape) > 1):
+    y = y[...,0]
   assert (len(zz.shape) == 2) or\
           (len(zz.shape) == 3 and ((zz.shape[-1] == 3) or (zz.shape[-1] == 4))),\
           f"`zz` must have exactly 2 non-trivial axes: {readShapes}."
@@ -129,6 +133,7 @@ def plot(ax, x, y,
   dataPlot(ax.plot, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
     
 def plot2d(ax, x, y, zz, 
+           force_aspect=True,
            centering='edge', 
            xlim=None, ylim=None, 
            padx=1.1, pady=1.1,
@@ -141,6 +146,7 @@ def plot2d(ax, x, y, zz,
   ----------
   ax .......................... : matplotlib axis object
   x, y ........................ : 1d or 2d arrays of coordinates
+  force_aspect [True] ......... : force equal aspect ratio according to axes
   centering ['edge'] .......... : centering of x & y nodes for the data ('edge', 'center')
   xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from x & y)
   padx [1.1], pady [1.1] ...... : add whitespace to axes in each direction (1 = no additional space)
@@ -153,7 +159,8 @@ def plot2d(ax, x, y, zz,
   x, y, zz = __checkDimensions2d(x, y, zz)
   ax.grid(False)
   extent = __findExtent(x, y, centering)
-  ax.imshow(zz, origin='lower', extent=extent, **kwargs)
+  aspect = 'auto' if not force_aspect else None
+  ax.imshow(zz, origin='lower', extent=extent, aspect=aspect, **kwargs)
   __setAxLims(ax, np.linspace(extent[0], extent[1]), False, padx, xlim, 'bottom')
   __setAxLims(ax, np.linspace(extent[2], extent[3]), False, pady, ylim, 'left')
   if cbar is not None:
@@ -165,6 +172,7 @@ def plotVectorField(ax, x, y, fx, fy, background=None,
                     texture_seed=None,
                     kernel_len=31, kernel_pow=1,
                     lic_alphamin=0.5, lic_alphamax=0.75, lic_contrast=0.33, lic_opacity=0.75,
+                    force_aspect=True,
                     centering='edge', 
                     xlim=None, ylim=None, 
                     padx=1.1, pady=1.1,
@@ -192,6 +200,7 @@ def plotVectorField(ax, x, y, fx, fy, background=None,
 
   the rest of the args are the same as for the `plot2d`
   ----------
+  force_aspect [True] ......... : force equal aspect ratio according to axes
   centering ['edge'] .......... : centering of x & y nodes for the data ('edge', 'center')
   xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from x & y)
   padx [1.1], pady [1.1] ...... : add whitespace to axes in each direction (1 = no additional space)
@@ -224,10 +233,10 @@ def plotVectorField(ax, x, y, fx, fy, background=None,
   colors[..., -1] = alphas
 
   plot2d(ax, x, y, background, 
-         centering=centering, xlim=xlim, ylim=ylim, 
+         force_aspect=force_aspect, centering=centering, xlim=xlim, ylim=ylim, 
          padx=padx, pady=pady, cbar=cbar, cbar_pad=cbar_pad, **kwargs)
   plot2d(ax, x, y, colors, 
-         centering=centering, xlim=xlim, ylim=ylim, 
+         force_aspect=force_aspect, centering=centering, xlim=xlim, ylim=ylim, 
          padx=padx, pady=pady, cbar=cbar, cbar_pad=cbar_pad, 
          alpha=lic_opacity)
   ax.grid(False)
