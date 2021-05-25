@@ -216,6 +216,11 @@ def plotVectorField(ax, x, y, fx, fy, background=None,
   x, y, fy = __checkDimensions2d(x, y, fy)
   if background is None:
     background = np.sqrt(fx**2 + fy**2)
+  # line integral convolution doesn't like zeros
+  fmin = (np.abs(fx).min() + np.abs(fy).min()) / 1e10
+  fx = (1.0 * (fx >= 0) - 1.0 * (fx < 0)) * (np.abs(fx) + fmin)
+  fy = (1.0 * (fy >= 0) - 1.0 * (fy < 0)) * (np.abs(fy) + fmin)
+
   x, y, background = __checkDimensions2d(x, y, background)
   texture = lic.generate_texture(background.shape, texture_seed)
   img1 = lic.line_integral_convolution(fx, fy, texture, kernel)
