@@ -1,4 +1,4 @@
-# `myplotlib`
+# `myplotlib v0.9`
 
 `matplotlib` binder with custom styles.
 
