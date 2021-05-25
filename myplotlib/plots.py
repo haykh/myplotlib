@@ -197,6 +197,7 @@ def plotVectorField(ax, x, y, fx, fy, background=None,
   lic_alphamax [0.75] ......... : lic parameter for max transparency
   lic_contrast [0.33] ......... : lic parameter for the contrast
   lic_opacity [0.75] .......... : lic parameter for the absolute opacity of the field plot
+  lic_cmap ['binary'] ......... : colormap used for the lic texture
 
   the rest of the args are the same as for the `plot2d`
   ----------
@@ -234,7 +235,7 @@ def plotVectorField(ax, x, y, fx, fy, background=None,
   alphas[alphas > lic_alphamax] = 1
   _ = (np.sign(weights - np.average(weights)) * np.abs(weights - np.average(weights))**lic_contrast)
   colors = matplotlib.colors.Normalize(None, None)(_)
-  colors = plt.cm.binary_r(colors)
+  colors = plt.cm.get_cmap(lic_cmap)(colors)
   colors[..., -1] = alphas
 
   plot2d(ax, x, y, background, 
