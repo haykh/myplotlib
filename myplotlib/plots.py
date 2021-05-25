@@ -173,7 +173,7 @@ def plotVectorField(ax, x, y, fx, fy, background=None,
                     kernel_len=31, kernel_pow=1,
                     lic_alphamin=0.5, lic_alphamax=0.75, 
                     lic_contrast=0.33, lic_opacity=0.75,
-                    lic_cmap='binary',
+                    lic_cmap='binary_r',
                     force_aspect=True,
                     centering='edge', 
                     xlim=None, ylim=None, 
@@ -199,7 +199,7 @@ def plotVectorField(ax, x, y, fx, fy, background=None,
   lic_alphamax [0.75] ......... : lic parameter for max transparency
   lic_contrast [0.33] ......... : lic parameter for the contrast
   lic_opacity [0.75] .......... : lic parameter for the absolute opacity of the field plot
-  lic_cmap ['binary'] ......... : colormap used for the lic texture
+  lic_cmap ['binary_r'] ....... : colormap used for the lic texture
 
   the rest of the args are the same as for the `plot2d`
   ----------
