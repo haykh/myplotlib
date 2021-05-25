@@ -7,6 +7,8 @@ grid.alpha: 0.2
 xtick.direction: in
 ytick.direction: in
 text.usetex: True
+text.latex.preamble: \usepackage{amsmath,bm,xcolor,ebgaramond-maths}
+
 font.family: EB Garamond
 mathtext.fontset: custom
 mathtext.rm: EB Garamond
