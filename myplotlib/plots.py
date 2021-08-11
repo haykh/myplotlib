@@ -95,6 +95,7 @@ def dataPlot(function, ax,
   function(x, y, **kwargs);
   __setAxLims(ax, x, xlog, padx, xlim, 'bottom')
   __setAxLims(ax, y, ylog, pady, ylim, 'left')
+  return None
 
 def scatter(ax, x, y, 
             xlog=False, ylog=False, 
@@ -112,7 +113,7 @@ def scatter(ax, x, y,
   padx [1.1], pady [1.1] ...... : add whitespace to axes in each direction (1 = no additional space)
   **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
   """
-  dataPlot(ax.scatter, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
+  return dataPlot(ax.scatter, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
     
 def plot(ax, x, y, 
          xlog=False, ylog=False, 
@@ -166,7 +167,9 @@ def plot2d(ax, x, y, zz,
   if cbar is not None:
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size=cbar, pad=cbar_pad)
-    plt.colorbar(ax.get_images()[0], cax=cax)
+    colorbar = plt.colorbar(ax.get_images()[0], cax=cax)
+    return colorbar
+  return None
 
 def plotVectorField(ax, x, y, fx, fy, background=None,
                     texture_seed=None,
@@ -240,11 +243,11 @@ def plotVectorField(ax, x, y, fx, fy, background=None,
   colors = plt.cm.get_cmap(lic_cmap)(colors)
   colors[..., -1] = alphas
 
-  plot2d(ax, x, y, background, 
+  colorbar = plot2d(ax, x, y, background, 
          force_aspect=force_aspect, centering=centering, xlim=xlim, ylim=ylim, 
          padx=padx, pady=pady, cbar=cbar, cbar_pad=cbar_pad, **kwargs)
   plot2d(ax, x, y, colors, 
          force_aspect=force_aspect, centering=centering, xlim=xlim, ylim=ylim, 
          padx=padx, pady=pady, cbar=cbar, cbar_pad=cbar_pad, 
          alpha=lic_opacity)
-  ax.grid(False)
+  return colorbar
