@@ -30,6 +30,7 @@ def __setMinMax(lims, data):
 
 def __setAxLims(ax, coords, log, pad, lim, spines):
   lim = __setMinMax(lim, coords)
+  # TODO: fix negative when log specified
   ax.spines[spines].set_bounds(*lim)
   if (spines == 'bottom'):
     func_setscale = ax.set_xscale
@@ -42,10 +43,10 @@ def __setAxLims(ax, coords, log, pad, lim, spines):
   if log:
     func_setscale('log')
     p1, p2 = lim
-    func_setlim(*list(map(lambda p: 10**p, __stretch(np.log10(p1), np.log10(p2), pad))))
+    func_setlim(*list(map(lambda p: 10**p, __stretch(np.log10(p1), np.log10(p2), 1.0 + pad))))
   else:
     p1, p2 = lim
-    func_setlim(*__stretch(p1, p2, pad))
+    func_setlim(*__stretch(p1, p2, 1.0 + pad))
 
 def __checkDimensions2d(x, y, zz):
   x, y, zz = (np.array(np.squeeze(x)), np.array(np.squeeze(y)), np.array(np.squeeze(zz)))
@@ -74,13 +75,13 @@ def __findExtent(x, y, centering):
   return extent
 
 def dataPlot(function, ax,
-             x, y, 
-             xlog=False, ylog=False, 
+             x, y,
+             xlog=False, ylog=False,
              xlim=None, ylim=None,
-             padx=1.1, pady=1.1, 
+             padx=0.0, pady=0.0,
              **kwargs):
   """
-  add a plot according to a passed function 
+  add a plot according to a passed function
 
   args
   ----------
@@ -89,7 +90,7 @@ def dataPlot(function, ax,
   x, y ........................ : 1d data arrays
   xlog [False], ylog [False] .. : use log in x or y direction
   xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from data)
-  padx [1.1], pady [1.1] ...... : add whitespace to axes in each direction (1 = no additional space)
+  padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
   **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
   """
   function(x, y, **kwargs);
@@ -97,10 +98,10 @@ def dataPlot(function, ax,
   __setAxLims(ax, y, ylog, pady, ylim, 'left')
   return None
 
-def scatter(ax, x, y, 
-            xlog=False, ylog=False, 
+def scatter(ax, x, y,
+            xlog=False, ylog=False,
             xlim=None, ylim=None,
-            padx=1.1, pady=1.1, **kwargs):
+            padx=0.0, pady=0.0, **kwargs):
   """
   add a scatter plot to a given axis (same as `dataPlot(ax.scatter, ...)`)
 
@@ -110,15 +111,15 @@ def scatter(ax, x, y,
   x, y ........................ : 1d data arrays
   xlog [False], ylog [False] .. : use log in x or y direction
   xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from data)
-  padx [1.1], pady [1.1] ...... : add whitespace to axes in each direction (1 = no additional space)
+  padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
   **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
   """
   return dataPlot(ax.scatter, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
-    
-def plot(ax, x, y, 
-         xlog=False, ylog=False, 
+
+def plot(ax, x, y,
+         xlog=False, ylog=False,
          xlim=None, ylim=None,
-         padx=1.1, pady=1.1, **kwargs):
+         padx=0.0, pady=0.0, **kwargs):
   """
   add a simple plot to a given axis (same as `dataPlot(ax.plot, ...)`)
 
@@ -128,16 +129,16 @@ def plot(ax, x, y,
   x, y ........................ : 1d data arrays
   xlog [False], ylog [False] .. : use log in x or y direction
   xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from data)
-  padx [1.1], pady [1.1] ...... : add whitespace to axes in each direction (1 = no additional space)
+  padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
   **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
   """
   dataPlot(ax.plot, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
-    
-def plot2d(ax, x, y, zz, 
+
+def plot2d(ax, x, y, zz,
            force_aspect=True,
-           centering='edge', 
-           xlim=None, ylim=None, 
-           padx=1.1, pady=1.1,
+           centering='edge',
+           xlim=None, ylim=None,
+           padx=0.0, pady=0.0,
            cbar='5%', cbar_pad=0.05,
            **kwargs):
   """
@@ -150,8 +151,8 @@ def plot2d(ax, x, y, zz,
   force_aspect [True] ......... : force equal aspect ratio according to axes
   centering ['edge'] .......... : centering of x & y nodes for the data ('edge', 'center')
   xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from x & y)
-  padx [1.1], pady [1.1] ...... : add whitespace to axes in each direction (1 = no additional space)
-  cbar ['5%'] ................. : size of the colorbar in percent of x-axis (None = no colorbar) 
+  padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
+  cbar ['5%'] ................. : size of the colorbar in percent of x-axis (None = no colorbar)
   cbar_pad [0.05] ............. : padding of the colorbar
   **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
   """
@@ -174,13 +175,13 @@ def plot2d(ax, x, y, zz,
 def plotVectorField(ax, x, y, fx, fy, background=None,
                     texture_seed=None,
                     kernel_len=31, kernel_pow=1,
-                    lic_alphamin=0.5, lic_alphamax=0.75, 
+                    lic_alphamin=0.5, lic_alphamax=0.75,
                     lic_contrast=0.33, lic_opacity=0.75,
                     lic_cmap='binary_r',
                     force_aspect=True,
-                    centering='edge', 
-                    xlim=None, ylim=None, 
-                    padx=1.1, pady=1.1,
+                    centering='edge',
+                    xlim=None, ylim=None,
+                    padx=0.0, pady=0.0,
                     cbar='5%', cbar_pad=0.05,
                     **kwargs):
   """
@@ -209,8 +210,8 @@ def plotVectorField(ax, x, y, fx, fy, background=None,
   force_aspect [True] ......... : force equal aspect ratio according to axes
   centering ['edge'] .......... : centering of x & y nodes for the data ('edge', 'center')
   xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from x & y)
-  padx [1.1], pady [1.1] ...... : add whitespace to axes in each direction (1 = no additional space)
-  cbar ['5%'] ................. : size of the colorbar in percent of x-axis (None = no colorbar) 
+  padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
+  cbar ['5%'] ................. : size of the colorbar in percent of x-axis (None = no colorbar)
   cbar_pad [0.05] ............. : padding of the colorbar
   **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
   """
@@ -243,11 +244,11 @@ def plotVectorField(ax, x, y, fx, fy, background=None,
   colors = plt.cm.get_cmap(lic_cmap)(colors)
   colors[..., -1] = alphas
 
-  colorbar = plot2d(ax, x, y, background, 
-         force_aspect=force_aspect, centering=centering, xlim=xlim, ylim=ylim, 
+  colorbar = plot2d(ax, x, y, background,
+         force_aspect=force_aspect, centering=centering, xlim=xlim, ylim=ylim,
          padx=padx, pady=pady, cbar=cbar, cbar_pad=cbar_pad, **kwargs)
-  plot2d(ax, x, y, colors, 
-         force_aspect=force_aspect, centering=centering, xlim=xlim, ylim=ylim, 
-         padx=padx, pady=pady, cbar=cbar, cbar_pad=cbar_pad, 
+  plot2d(ax, x, y, colors,
+         force_aspect=force_aspect, centering=centering, xlim=xlim, ylim=ylim,
+         padx=padx, pady=pady, cbar=cbar, cbar_pad=cbar_pad,
          alpha=lic_opacity)
   return colorbar
