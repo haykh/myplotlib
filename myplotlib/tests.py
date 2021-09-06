@@ -27,18 +27,17 @@ def __getAx(ax):
 
 def testColormaps(ax=None):
   ax = __getAx(ax)
-  with plt.style.context('default'):
-    zz = [np.linspace(0, 1, 256)]
-    pad = 0.3
-    dy = (1 - pad) / (len(myplotlib.CUSTOM_CMAPS))
-    pady = pad / (len(myplotlib.CUSTOM_CMAPS))
-    for i, cm in enumerate(myplotlib.CUSTOM_CMAPS):
-      y1, y2 = (pady * (i + 0.5) + dy * i, pady * (i + 0.5) + dy * (i + 1))
-      ax.imshow(zz, extent=(0, 1, y1, y2), cmap=cm);
-      ax.text(1.04, 0.5 * (y1 + y2), f"\'{cm}\'", va='center', ha='left')
-    ax.set_ylim(0, 1);
-    ax.axis('off');
-    ax.set_title("extra colormaps")
+  zz = [np.linspace(0, 1, 256)]
+  pad = 0.3
+  dy = (1 - pad) / (len(myplotlib.CUSTOM_CMAPS))
+  pady = pad / (len(myplotlib.CUSTOM_CMAPS))
+  for i, cm in enumerate(myplotlib.CUSTOM_CMAPS):
+    y1, y2 = (pady * (i + 0.5) + dy * i, pady * (i + 0.5) + dy * (i + 1))
+    ax.imshow(zz, extent=(0, 1, y1, y2), cmap=cm);
+    ax.text(1.04, 0.5 * (y1 + y2), r"$\texttt{{'{}'}}$".format(cm), va='center', ha='left')
+  ax.set_ylim(0, 1);
+  ax.axis('off');
+  ax.set_title("extra colormaps")
 
 def testColors(ax=None):
   ax = __getAx(ax)
@@ -47,24 +46,23 @@ def testColors(ax=None):
   title = 'default color cycle'
   ax.set_title(title)
   for j, c in enumerate(colors):
-    with plt.style.context('default'):
-      v_offset = -(j / len(colors))
-      th = np.linspace(0, 2*np.pi, 512)
-      ax.plot(th, .1*np.sin(th) + v_offset, color=c, lw=2)
-      ax.annotate("'C{}'".format(j), (0, v_offset),
-                  xytext=(-1.5, 0),
-                  ha='right',
-                  va='center',
-                  color=c,
-                  textcoords='offset points',
-                  family='monospace')
-      ax.annotate("{!r}".format(c), (2*np.pi, v_offset),
-                  xytext=(1.5, 0),
-                  ha='left',
-                  va='center',
-                  color=c,
-                  textcoords='offset points',
-                  family='monospace')
+    v_offset = -(j / len(colors))
+    th = np.linspace(0, 2*np.pi, 512)
+    ax.plot(th, .1*np.sin(th) + v_offset, color=c, lw=2)
+    ax.annotate(r"$\texttt{{'C{}'}}$".format(j),
+                (0, v_offset),
+                xytext=(-1.5, 0),
+                ha='right',
+                va='center',
+                color=c,
+                textcoords='offset points')
+    ax.annotate(r"$\texttt{{{}}}$".format(c.replace('#', '\#')),
+                (2*np.pi, v_offset),
+                xytext=(1.5, 0),
+                ha='left',
+                va='center',
+                color=c,
+                textcoords='offset points')
     ax.axis('off')
 
 def testScatter(ax=None):
@@ -99,7 +97,7 @@ def testErrorbar(ax=None):
   y = np.sin(x / 100)
   dy = np.random.random(len(x)) * (y + 1.5) / 3
   myplt.dataPlot(ax.errorbar, ax, x, y, yerr=dy, padx=0.1, pady=1,
-              marker='o', markeredgecolor='w', markerfacecolor='C11', markeredgewidth=1.5)
+              marker='o', markeredgecolor=ax.get_facecolor(), markerfacecolor='C11', markeredgewidth=1.5)
   ax.set_xlabel('time [s]')
   ax.set_ylabel('my very accurately measured variable [ly]')
 
@@ -134,7 +132,6 @@ def testVectorPlot2d(ax=None):
                         norm=matplotlib.colors.LogNorm(1, 1e2), cmap='turbo', lic_contrast=1)
 
 def testAll():
-  myplotlib.load()
   fig = plt.figure(figsize=(12, 16))
   axshape = (4, 2)
   axi = 1
