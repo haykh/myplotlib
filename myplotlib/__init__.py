@@ -38,6 +38,15 @@ def __InstallCmapFromCSV(csv):
     plt.register_cmap(cmap=mpl.colors.LinearSegmentedColormap(cmap, mpl_data_r, cmap_data.shape[0]))
 
 def load(style='main'):
+  """
+  `myplotlib.load`
+
+  preload custom style
+
+  args
+  ----------
+  style ['main'] .............. : style to load (options: 'main', 'dark')
+  """
   import os
   import pkg_resources
   from matplotlib import font_manager
