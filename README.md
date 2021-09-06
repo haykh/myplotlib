@@ -1,8 +1,6 @@
 # `myplotlib v0.9.1`
 
-`matplotlib` binder with custom styles.
-
-![preview](https://github.com/haykh/myplotlib/blob/master/myplotlib/preview.jpg)
+`matplotlib` binder with custom styles. see ![previews of available styles](myplotlib/previews).
 
 ### installation
 
@@ -13,9 +11,10 @@ pip install git+https://github.com/haykh/myplotlib.git@master
 ### usage
 
 ```python
-# initialize styles:
+# initialize style:
 import myplotlib
-myplotlib.load()
+myplotlib.load(style=...)
+# if not specified defaults to `style = 'main'`
 
 # auxiliary functions for plotting:
 import myplotlib.plots as myplt
