@@ -1,6 +1,6 @@
 # `myplotlib v0.9.1`
 
-`matplotlib` binder with custom styles. see ![previews of available styles](myplotlib/previews).
+`matplotlib` binder with custom styles. see [previews of available styles](myplotlib/previews).
 
 ### installation
 
