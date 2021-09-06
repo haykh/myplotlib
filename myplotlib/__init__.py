@@ -37,7 +37,7 @@ def __InstallCmapFromCSV(csv):
     mpl_data_r = __RGBToPyCmap(cmap_data[::-1,:])
     plt.register_cmap(cmap=mpl.colors.LinearSegmentedColormap(cmap, mpl_data_r, cmap_data.shape[0]))
 
-def load(style='main'):
+def load(style='fancy', flavor='light'):
   """
   `myplotlib.load`
 
@@ -45,7 +45,8 @@ def load(style='main'):
 
   args
   ----------
-  style ['main'] .............. : style to load (options: 'main', 'dark')
+  style ['fancy'] ............. : style to load (options: 'fancy', 'mono')
+  flavor ['light'] ............ : color flavor to load (options: 'light', 'dark')
   """
   import os
   import pkg_resources
@@ -60,5 +61,5 @@ def load(style='main'):
   font_files = font_manager.findSystemFonts(fontpaths=[FONT_DIR])
   for font_file in font_files:
     font_manager.fontManager.addfont(font_file)
-  MPLSTYLE_FILE = pkg_resources.resource_stream(__name__, f'assets/{style}.mplstyle')
+  MPLSTYLE_FILE = pkg_resources.resource_stream(__name__, f'assets/{style}.{flavor}.mplstyle')
   plt.style.use(MPLSTYLE_FILE.name)

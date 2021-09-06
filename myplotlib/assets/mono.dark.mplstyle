@@ -1,0 +1,22 @@
+figure.dpi: 150
+axes.spines.top: False
+axes.spines.right: False
+axes.grid: True
+axes.axisbelow: True
+grid.alpha: 0.2
+xtick.direction: in
+ytick.direction: in
+
+font.family: monospace
+
+axes.prop_cycle: cycler('color', ["8bc6e4","f48a7c","3af899","fccd88","be9ac1","7d8c80","e95d7c","2688e3"])
+
+# dark properties
+figure.facecolor: 2a2727
+axes.facecolor: 453f3d
+axes.edgecolor: white
+axes.labelcolor: white
+xtick.color: white
+ytick.color: white
+patch.edgecolor: white
+text.color: white

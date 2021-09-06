@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-__version__ = '0.9.2'
+__version__ = '0.9.3'
 
 setup(
     python_requires='>3.6.0',
@@ -9,7 +9,7 @@ setup(
     description='`matplotlib` binding with custom styles',
     url='https://github.com/haykh/myplotlib',
     author='Hayk Hakobyan',
-    author_email='hayk.hakopyan@gmail.com',
+    author_email='haykh.public+myplotlib@gmail.com',
     license='BSD 2-Clause',
     install_requires=[
       'matplotlib>=3.0.0',

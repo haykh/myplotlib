@@ -1,4 +1,4 @@
-# `myplotlib v0.9.2`
+# `myplotlib v0.9.3`
 
 `matplotlib` binder with custom styles. see [previews of available styles](myplotlib/previews).
 
@@ -13,8 +13,10 @@ pip install git+https://github.com/haykh/myplotlib.git@master
 ```python
 # initialize style:
 import myplotlib
-myplotlib.load(style=...)
-# if not specified defaults to `style = 'main'`
+myplotlib.load(style=..., flavor=...)
+# style can be [`fancy` | `mono`]
+# flavor can be [`light` | `dark`]
+# if not specified defaults to `style = 'main', flavor = 'light'`
 
 # auxiliary functions for plotting:
 import myplotlib.plots as myplt
@@ -43,4 +45,4 @@ for more usage examples checkout the `tests/` submodule.
 - [x] add image to readme
 - [ ] isocontour plotting
 - [x] dark mode
-- [ ] monotype non-Latex mode
+- [x] monotype non-Latex mode

@@ -34,7 +34,11 @@ def testColormaps(ax=None):
   for i, cm in enumerate(myplotlib.CUSTOM_CMAPS):
     y1, y2 = (pady * (i + 0.5) + dy * i, pady * (i + 0.5) + dy * (i + 1))
     ax.imshow(zz, extent=(0, 1, y1, y2), cmap=cm);
-    ax.text(1.04, 0.5 * (y1 + y2), r"$\texttt{{'{}'}}$".format(cm), va='center', ha='left')
+    if matplotlib.rcParams['text.usetex']:
+      name = r"$\texttt{{'{}'}}$".format(cm)
+    else:
+      name = f"\'{cm}\'"
+    ax.text(1.04, 0.5 * (y1 + y2), name, va='center', ha='left')
   ax.set_ylim(0, 1);
   ax.axis('off');
   ax.set_title("extra colormaps")
@@ -49,14 +53,22 @@ def testColors(ax=None):
     v_offset = -(j / len(colors))
     th = np.linspace(0, 2*np.pi, 512)
     ax.plot(th, .1*np.sin(th) + v_offset, color=c, lw=2)
-    ax.annotate(r"$\texttt{{'C{}'}}$".format(j),
+    if matplotlib.rcParams['text.usetex']:
+      name = r"$\texttt{{'C{}'}}$".format(j)
+    else:
+      name = f"\'C{j}\'"
+    ax.annotate(name,
                 (0, v_offset),
                 xytext=(-1.5, 0),
                 ha='right',
                 va='center',
                 color=c,
                 textcoords='offset points')
-    ax.annotate(r"$\texttt{{{}}}$".format(c.replace('#', '\#')),
+    if matplotlib.rcParams['text.usetex']:
+      name = r"$\texttt{{{}}}$".format(c.replace('#', '\#'))
+    else:
+      name = f"\'{c}\'"
+    ax.annotate(name,
                 (2*np.pi, v_offset),
                 xytext=(1.5, 0),
                 ha='left',
@@ -88,7 +100,7 @@ def testPlot(ax=None):
              padx=0.2, pady=1, c='C4', ls=':');
   myplt.plot(ax, np.arange(100), 20 * (2 + np.sin(np.linspace(0, 20, 100)) + np.random.random(100)**5),
              padx=0.2, pady=1, c='C2');
-  ax.set_ylabel('probability [\%]')
+  ax.set_ylabel(r'probability [$\%$]')
   ax.set_xlabel('age [yr]')
 
 def testErrorbar(ax=None):
