@@ -1,7 +1,7 @@
-# `main` style
+# `main`
 
-![main](main.png)
+![main](main.jpg)
 
-# `dark` style
+# `dark`
 
-![dark](dark.png)
+![dark](dark.jpg)
