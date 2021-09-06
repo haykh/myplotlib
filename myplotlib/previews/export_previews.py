@@ -12,7 +12,7 @@ for st, fl in [f.replace('.mplstyle', '').split('.') for f in os.listdir("../ass
   myplotlib.load(st, fl)
   mypltests.testAll()
   plt.savefig(f'{st}_{fl}.jpg')
-  readme += f"#`{st}.{fl}`\n\n![{st}_{fl}]({st}_{fl}.jpg)\n\n"
+  readme += f"# `{st}.{fl}`\n\n![{st}_{fl}]({st}_{fl}.jpg)\n\n"
 
 with open("README.md", 'w') as f:
   f.write(readme)
