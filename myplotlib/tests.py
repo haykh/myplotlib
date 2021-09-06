@@ -67,7 +67,7 @@ def testColors(ax=None):
     if matplotlib.rcParams['text.usetex']:
       name = r"$\texttt{{{}}}$".format(c.replace('#', '\#'))
     else:
-      name = f"\'{c}\'"
+      name = f"{c}"
     ax.annotate(name,
                 (2*np.pi, v_offset),
                 xytext=(1.5, 0),
