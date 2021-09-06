@@ -1,15 +1,16 @@
-# `fancy`
+#`mono.dark`
 
-## `light`
-![fancy_light](fancy_light.jpg)
+![mono_dark](mono_dark.jpg)
 
-## `dark`
+#`fancy.dark`
+
 ![fancy_dark](fancy_dark.jpg)
 
-# `mono`
+#`mono.light`
 
-## `light`
 ![mono_light](mono_light.jpg)
 
-## `dark`
-![mono_dark](mono_dark.jpg)
+#`fancy.light`
+
+![fancy_light](fancy_light.jpg)
+
