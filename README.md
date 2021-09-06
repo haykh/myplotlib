@@ -1,4 +1,4 @@
-# `myplotlib v0.9.1`
+# `myplotlib v0.9.2`
 
 `matplotlib` binder with custom styles. see [previews of available styles](myplotlib/previews).
 
@@ -31,7 +31,8 @@ for more usage examples checkout the `tests/` submodule.
 
 ### requirements
 
-* `matplotlib>=3.0.0`, `numpy`, `scipy`, `numba`
+* `python >= 3.6`
+* `matplotlib >= 3.0.0`, `numpy`, `scipy`, `numba`
 * `latex` (install separately)
 
 ### To-do
