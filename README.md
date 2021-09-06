@@ -42,5 +42,5 @@ for more usage examples checkout the `tests/` submodule.
 - [x] add a test plot for the demo
 - [x] add image to readme
 - [ ] isocontour plotting
-- [ ] dark mode
+- [x] dark mode
 - [ ] monotype non-Latex mode
