@@ -43,3 +43,4 @@ for more usage examples checkout the `tests/` submodule.
 - [x] add image to readme
 - [ ] isocontour plotting
 - [ ] dark mode
+- [ ] monotype non-Latex mode
