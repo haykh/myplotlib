@@ -1,4 +1,4 @@
-# `myplotlib v0.9.3`
+# `myplotlib v0.9.4`
 
 `matplotlib` binder with custom styles. see [previews of available styles](myplotlib/previews).
 
@@ -14,7 +14,7 @@ pip install git+https://github.com/haykh/myplotlib.git@master
 # initialize style:
 import myplotlib
 myplotlib.load(style=..., flavor=...)
-# style can be [`fancy` | `mono`]
+# style can be [`fancy` | `mono` | `hershey`]
 # flavor can be [`light` | `dark`]
 # if not specified defaults to `style = 'main', flavor = 'light'`
 
@@ -34,15 +34,22 @@ for more usage examples checkout the `tests/` submodule.
 ### requirements
 
 * `python >= 3.6`
-* `matplotlib >= 3.0.0`, `numpy`, `scipy`, `numba`
-* `latex` (install separately)
+* `matplotlib >= 3.0.0`, `numpy`, `numba`
+* `latex` (used for `style="fancy"` only)
+
+### Latest updates
+
+* `v0.9.4` [Mar 2022]
+  - new `hershey` style a-la IDL
+  - minor bug fixes in auto-determining the plot ranges
+  - PEP 8 compatible style
 
 ### To-do
 
+- [ ] isocontour plotting
 - [x] add streamplot for fieldline plotting
 - [x] print all the newly added colormaps and the default color sequence
 - [x] add a test plot for the demo
 - [x] add image to readme
-- [ ] isocontour plotting
 - [x] dark mode
 - [x] monotype non-Latex mode
