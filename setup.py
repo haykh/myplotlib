@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-__version__ = '0.9.3'
+__version__ = '0.9.4'
 
 setup(
     python_requires='>3.6.0',
@@ -14,8 +14,6 @@ setup(
     install_requires=[
       'matplotlib>=3.0.0',
       'numpy',
-      'tqdm',
-      'scipy',
       'numba'
     ],
     packages=find_packages(),

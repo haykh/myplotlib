@@ -1,0 +1,28 @@
+figure.dpi: 300
+xtick.direction: in
+ytick.direction: in
+
+font.family: Hershey
+mathtext.fontset: custom
+mathtext.rm: Hershey
+mathtext.it: Hershey
+mathtext.bf: Hershey
+lines.linewidth: 0.5
+axes.linewidth: 0.45
+legend.frameon: False
+xtick.major.width: 0.5
+ytick.major.width: 0.5
+xtick.minor.visible: True
+ytick.minor.visible: True
+
+axes.prop_cycle: cycler("color", ["FFFFFF", "FF5555", "5555FF", "55FF55", "FF55FF", "55FFFF", "FFFF55", "AAAAAA"])
+
+grid.alpha: 0.2
+figure.facecolor: black
+axes.facecolor: black
+axes.edgecolor: white
+axes.labelcolor: white
+xtick.color: white
+ytick.color: white
+patch.edgecolor: white
+text.color: white
