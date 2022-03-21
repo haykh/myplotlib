@@ -6,6 +6,14 @@
 
 ![fancy_dark](fancy_dark.jpg)
 
+# `hershey.dark`
+
+![hershey_dark](hershey_dark.jpg)
+
+# `hershey.light`
+
+![hershey_light](hershey_light.jpg)
+
 # `mono.light`
 
 ![mono_light](mono_light.jpg)
