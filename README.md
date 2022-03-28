@@ -38,7 +38,9 @@ for more usage examples checkout the `tests/` submodule.
 * `latex` (used for `style="fancy"` only)
 
 ### Latest updates
-
+* `0.9.4r2` [Mar 2022]
+  - better `hershey` font
+  - fallback cursive font added
 * `v0.9.4` [Mar 2022]
   - new `hershey` style a-la IDL
   - minor bug fixes in auto-determining the plot ranges

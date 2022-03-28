@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-__version__ = '0.9.4'
+__version__ = '0.9.4r2'
 
 setup(
     python_requires='>3.6.0',
