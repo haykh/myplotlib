@@ -2,11 +2,11 @@ figure.dpi: 300
 xtick.direction: in
 ytick.direction: in
 
-font.family: Hershey
+font.family: HersheyTex_Book
 mathtext.fontset: custom
-mathtext.rm: Hershey
-mathtext.it: Hershey
-mathtext.bf: Hershey
+mathtext.rm: HersheyTex_Book
+mathtext.it: HersheyTex_Book
+mathtext.bf: HersheyTex_Book
 lines.linewidth: 0.5
 axes.linewidth: 0.45
 legend.frameon: False
