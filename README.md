@@ -1,6 +1,6 @@
 # `myplotlib`
 
-`matplotlib` binder with custom styles and routines for fast plotting. see [previews of available styles](myplotlib/previews).
+`matplotlib` binder with custom styles and routines for fast plotting. see [previews of available styles](https://github.com/haykh/myplotlib/tree/master/previews#readme).
 
 ### installation
 
@@ -44,17 +44,6 @@ Building tarballs in the `dist` directory:
 ```sh
 python -m build --sdist --outdir dist .
 ```
-
-### Latest updates
-* `1.0.0` [Dec 2022]
-  - initial release to pypi
-* `0.9.4r2` [Mar 2022]
-  - better `hershey` font
-  - fallback cursive font added
-* `v0.9.4` [Mar 2022]
-  - new `hershey` style a-la IDL
-  - minor bug fixes in auto-determining the plot ranges
-  - PEP 8 compatible style
 
 ### To-do
 
