@@ -1,11 +1,11 @@
-# `myplotlib v0.9.4`
+# `myplotlib`
 
-`matplotlib` binder with custom styles. see [previews of available styles](myplotlib/previews).
+`matplotlib` binder with custom styles and routines for fast plotting. see [previews of available styles](myplotlib/previews).
 
 ### installation
 
 ```shell
-pip install git+https://github.com/haykh/myplotlib.git@master
+pip install myplotlib
 ```
 
 ### usage
@@ -37,7 +37,17 @@ for more usage examples checkout the `tests/` submodule.
 * `matplotlib >= 3.0.0`, `numpy`, `numba`
 * `latex` (used for `style="fancy"` only)
 
+### development
+
+Building tarballs in the `dist` directory:
+
+```sh
+python -m build --sdist --outdir dist .
+```
+
 ### Latest updates
+* `1.0.0` [Dec 2022]
+  - initial release to pypi
 * `0.9.4r2` [Mar 2022]
   - better `hershey` font
   - fallback cursive font added
