@@ -1,6 +1,6 @@
 import pkg_resources
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 CUSTOM_CMAPS = []
 
@@ -49,7 +49,7 @@ def __InstallCmapFromCSV(csv):
         )
 
 
-def load(style="fancy", flavor="light"):
+def load(style=None, flavor="light"):
     """
     `myplotlib.load`
 
@@ -57,7 +57,7 @@ def load(style="fancy", flavor="light"):
 
     args
     ----------
-    style ['fancy'] ............. : style to load (options: 'fancy', 'mono', 'hershey')
+    style [None] ............. : style to load (options: None, 'fancy', 'mono', 'hershey')
     flavor ['light'] ............ : color flavor to load (options: 'light', 'dark')
     """
     import os
@@ -74,7 +74,8 @@ def load(style="fancy", flavor="light"):
     font_files = font_manager.findSystemFonts(fontpaths=[FONT_DIR])
     for font_file in font_files:
         font_manager.fontManager.addfont(font_file)
-    MPLSTYLE_FILE = pkg_resources.resource_stream(
-        __name__, f"assets/{style}.{flavor}.mplstyle"
-    )
-    plt.style.use(MPLSTYLE_FILE.name)
+    if style is not None:
+        MPLSTYLE_FILE = pkg_resources.resource_stream(
+            __name__, f"assets/{style}.{flavor}.mplstyle"
+        )
+        plt.style.use(MPLSTYLE_FILE.name)

@@ -223,14 +223,8 @@ def plot2d(
     aspect = "auto" if not force_aspect else None
     if not ("norm" in kwargs):
         if zlim is None:
-            # vmin = np.nanmin(zz)
-            # vmax = np.nanmax(zz)
-            # print (vmin, vmax)
-            # if (np.abs(vmin) > 0) and \
-            #     (((np.abs(vmax / vmin) > 1e4) and not zlog) or\
-            #     ((np.abs(vmax / vmin) > 1e6) and zlog)):
-            vmax = np.quantile(zz[~np.isnan(zz)], 0.95)
-            vmin = np.quantile(zz[~np.isnan(zz)], 0.05)
+            vmax = np.quantile(zz[~np.isnan(zz) & ~np.isinf(zz)], 0.95)
+            vmin = np.quantile(zz[~np.isnan(zz) & ~np.isinf(zz)], 0.05)
         else:
             vmin, vmax = zlim
         if zlog:
