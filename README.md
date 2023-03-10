@@ -2,6 +2,8 @@
 
 `matplotlib` binder with custom styles and routines for fast plotting. see [previews of available styles](https://github.com/haykh/myplotlib/tree/master/previews#readme).
 
+> _Note_: `numba` support in line-integral-convolution algorithm has been temporarily removed due to incompatibility with `python` 3.11; see [issue](https://github.com/numba/numba/issues/8304). Because of this the line integral convolution algorithm is quite slow and not recommended for usage.
+
 ### installation
 
 ```shell
@@ -34,7 +36,7 @@ for more usage examples checkout the `tests/` submodule.
 ### requirements
 
 * `python >= 3.6`
-* `matplotlib >= 3.0.0`, `numpy`, `numba`
+* `matplotlib >= 3.0.0`, `numpy`
 * `latex` (used for `style="fancy"` only)
 
 ### development
