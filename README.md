@@ -16,9 +16,9 @@ pip install myplotlib
 # initialize style:
 import myplotlib
 myplotlib.load(style=..., flavor=...)
-# style can be [`fancy` | `mono` | `hershey`]
-# flavor can be [`light` | `dark`]
-# if not specified defaults to `style = 'main', flavor = 'light'`
+# style can be [None | `fancy` | `mono` | `hershey`]
+# flavor can be [None | `light` | `dark`]
+# if not specified defaults to `style = None, flavor = None`
 
 # auxiliary functions for plotting:
 import myplotlib.plots as myplt
