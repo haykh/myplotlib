@@ -182,7 +182,7 @@ def testVectorPlot2d(ax=None):
     xs = np.linspace(-1, 1, sx).astype(np.float64)[None, :]
     ys = np.linspace(-1, 1, sy).astype(np.float64)[:, None]
     vectors = np.zeros((sx, sy, 2), dtype=np.float64)
-    for (x, y) in vortices:
+    for x, y in vortices:
         rsq = (xs - x) ** 2 + (ys - y) ** 2
         vectors[..., 0] += (ys - y) / rsq
         vectors[..., 1] += -(xs - x) / rsq

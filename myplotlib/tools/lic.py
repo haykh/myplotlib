@@ -6,12 +6,8 @@
 # A NUMBA based implementation of the code found here:
 # https://scipy-cookbook.readthedocs.io/items/LineIntegralConvolution.html
 
-# NOTE [3-10-2023]:
-# | NUMBA support temporarily disabled due to incompatibility with python 3.11
-
 import numpy as np
-from numpy import ones
-# from numba import jit, guvectorize, float64, int32
+from numba import jit
 
 
 def generate_kernel(klen):
@@ -25,7 +21,7 @@ def generate_texture(shape, seed=None):
     return np.random.rand(*shape).astype(np.float64)
 
 
-# @jit
+@jit(nopython=False)
 def advance(vx, vy, xyArr, fxfyArr, w, h):
     if vx >= 0:
         tx = (1 - fxfyArr[1]) / vx
@@ -61,7 +57,7 @@ def advance(vx, vy, xyArr, fxfyArr, w, h):
         xyArr[0] = h - 1  # FIXME: other boundary conditions?
 
 
-# @jit(nopython=True)
+@jit(nopython=True)
 def line_integral_convolution(vx, vy, texture, kernel):
     h = vx.shape[0]
     w = vx.shape[1]
