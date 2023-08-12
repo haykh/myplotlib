@@ -36,6 +36,7 @@ for more usage examples checkout the `tests/` submodule.
 * `python >= 3.6`
 * `matplotlib >= 3.0.0`, `numpy`
 * `latex` (used for `style="fancy"` only)
+* `numba>=0.57.0`
 
 ### development
 

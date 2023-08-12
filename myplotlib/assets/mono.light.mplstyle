@@ -1,11 +1,10 @@
 figure.dpi: 150
-axes.spines.top: False
-axes.spines.right: False
-axes.grid: True
 axes.axisbelow: True
+axes.grid: False
+grid.linewidth: 0.2
+xtick.direction: out
+ytick.direction: out
 grid.alpha: 0.2
-xtick.direction: in
-ytick.direction: in
 
 font.family: monospace
 

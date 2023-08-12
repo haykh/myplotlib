@@ -1,6 +1,6 @@
 import pkg_resources
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 
 CUSTOM_CMAPS = []
 
