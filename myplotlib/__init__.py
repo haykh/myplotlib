@@ -1,6 +1,4 @@
-import pkg_resources
-
-__version__ = "1.1.1"
+__version__ = "1.2.0"
 
 CUSTOM_CMAPS = []
 
@@ -61,21 +59,20 @@ def load(style=None, flavor="light"):
     flavor ['light'] ............ : color flavor to load (options: 'light', 'dark')
     """
     import os
-    import pkg_resources
     from matplotlib import font_manager
     import matplotlib.pyplot as plt
 
-    CMAP_DIR = pkg_resources.resource_filename(__name__, "assets/colormaps")
-    CMAPS = pkg_resources.resource_listdir(__name__, "assets/colormaps")
+    CMAP_DIR = os.path.join(os.path.dirname(__file__), "assets/colormaps")
+    CMAPS = os.listdir(CMAP_DIR)
     for cmap in CMAPS:
         cmapname = os.path.join(CMAP_DIR, cmap)
         __InstallCmapFromCSV(cmapname)
-    FONT_DIR = pkg_resources.resource_filename(__name__, "assets/fonts")
+    FONT_DIR = os.path.join(os.path.dirname(__file__), "assets/fonts")
     font_files = font_manager.findSystemFonts(fontpaths=[FONT_DIR])
     for font_file in font_files:
         font_manager.fontManager.addfont(font_file)
     if style is not None:
-        MPLSTYLE_FILE = pkg_resources.resource_stream(
-            __name__, f"assets/{style}.{flavor}.mplstyle"
+        MPLSTYLE_FILE = os.path.join(
+            os.path.dirname(__file__), f"assets/{style}.{flavor}.mplstyle"
         )
-        plt.style.use(MPLSTYLE_FILE.name)
+        plt.style.use(MPLSTYLE_FILE)

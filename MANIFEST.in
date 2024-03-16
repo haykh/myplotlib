@@ -1,3 +1,6 @@
-recursive-include myplotlib/assets *
+include myplotlib/assets/*
+include myplotlib/assets/fonts/*
+include myplotlib/assets/colormaps/*
 include LICENSE
+include README.md
 include pyproject.toml
