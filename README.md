@@ -33,7 +33,7 @@ for more usage examples checkout the `tests/` submodule.
 
 ### requirements
 
-* `python >= 3.6`
+* `python >= 3.8`
 * `matplotlib >= 3.0.0`, `numpy`
 * `latex` (used for `style="fancy"` only)
 * `numba>=0.57.0`
