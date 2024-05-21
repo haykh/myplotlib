@@ -336,7 +336,7 @@ def plotVectorField(
         * np.abs(weights - np.average(weights)) ** lic_contrast
     )
     colors = matplotlib.colors.Normalize(None, None)(_)
-    colors = plt.cm.get_cmap(lic_cmap)(colors)
+    colors = matplotlib.colormaps[lic_cmap](colors)
     colors[..., -1] = alphas
 
     colorbar = plot2d(

@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "myplotlib"
 dynamic = ["version"]
-dependencies = ["matplotlib>=3.0.0", "numpy", "numba>=0.57.0"]
+dependencies = ["matplotlib>=3.5.0", "numpy", "numba>=0.57.0"]
 requires-python = ">=3.8"
 authors = [{ name = "Hayk", email = "haykh.astro@gmail.com" }]
 maintainers = [{ name = "Hayk", email = "haykh.astro@gmail.com" }]

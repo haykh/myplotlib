@@ -1,4 +1,4 @@
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 CUSTOM_CMAPS = []
 
@@ -27,20 +27,19 @@ def __InstallCmapFromCSV(csv):
     import os
     import numpy as np
     import matplotlib as mpl
-    import matplotlib.pyplot as plt
 
     cmap = os.path.splitext(os.path.basename(csv))[0]
     cmap_data = np.loadtxt(csv, delimiter=",")
-    if cmap not in plt.colormaps():
+    if cmap not in mpl.colormaps.keys():
         CUSTOM_CMAPS.append(cmap)
         mpl_data = __RGBToPyCmap(cmap_data)
-        plt.register_cmap(
+        mpl.colormaps.register(
             cmap=mpl.colors.LinearSegmentedColormap(cmap, mpl_data, cmap_data.shape[0])
         )
     cmap = f"{cmap}_r"
-    if cmap not in plt.colormaps():
+    if cmap not in mpl.colormaps.keys():
         mpl_data_r = __RGBToPyCmap(cmap_data[::-1, :])
-        plt.register_cmap(
+        mpl.colormaps.register(
             cmap=mpl.colors.LinearSegmentedColormap(
                 cmap, mpl_data_r, cmap_data.shape[0]
             )
