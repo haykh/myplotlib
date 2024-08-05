@@ -126,7 +126,7 @@ def dataPlot(
     xlog [False], ylog [False] .. : use log in x or y direction
     xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from data)
     padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
-    **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
+    **kwargs .................... : standard matplotlib kwargs passed to `ax.<function>`
     """
     if padx != 0:
         ax.spines["top"].set_visible(False)
@@ -169,7 +169,7 @@ def plot(
     xlog [False], ylog [False] .. : use log in x or y direction
     xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from data)
     padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
-    **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
+    **kwargs .................... : standard matplotlib kwargs passed to `ax.plot`
     """
     dataPlot(ax.plot, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
 
@@ -189,6 +189,7 @@ def plot2d(
     pady=0.0,
     cbar="5%",
     cbar_pad=0.05,
+    cbar_pos="right",
     **kwargs,
 ):
     """
@@ -206,7 +207,8 @@ def plot2d(
     padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
     cbar ['5%'] ................. : size of the colorbar in percent of x-axis (None = no colorbar)
     cbar_pad [0.05] ............. : padding of the colorbar
-    **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
+    cbar_pos ['right'] .......... : position of the colorbar ('left', 'right', 'top', 'bottom')
+    **kwargs .................... : standard matplotlib kwargs passed to `ax.imshow`
 
     returns
     ----------
@@ -216,6 +218,9 @@ def plot2d(
     from mpl_toolkits.axes_grid1 import make_axes_locatable
     import matplotlib.pyplot as plt
     import matplotlib as mpl
+
+    assert centering in ["edge", "center"], "invalid `centering`"
+    assert cbar_pos in ["left", "right", "top", "bottom"], "invalid `cbar_pos`"
 
     x, y, zz = __checkDimensions2d(x, y, zz)
     ax.grid(False)
@@ -241,8 +246,20 @@ def plot2d(
     __setAxLims(ax, np.linspace(extent[2], extent[3]), False, pady, ylim, "left")
     if cbar is not None:
         divider = make_axes_locatable(ax)
-        cax = divider.append_axes("right", size=cbar, pad=cbar_pad)
-        colorbar = plt.colorbar(ax.get_images()[0], cax=cax)
+        cax = divider.append_axes(cbar_pos, size=cbar, pad=cbar_pad)
+        colorbar = plt.colorbar(ax.get_images()[0], cax=cax,
+                                orientation="vertical" if cbar_pos in ["left", "right"] else "horizontal")
+        if cbar_pos == "left":
+            cax.yaxis.set_ticks_position("left")
+            cax.yaxis.set_label_position("left")
+            ax.yaxis.set_ticks_position("right")
+            ax.yaxis.set_label_position("right")
+        if cbar_pos == "top":
+            cax.xaxis.set_ticks_position("top")
+            cax.xaxis.set_label_position("top")
+        if cbar_pos == "bottom":
+            ax.xaxis.set_ticks_position("top")
+            ax.xaxis.set_label_position("top")
         return colorbar
     else:
         return None
@@ -302,7 +319,7 @@ def plotVectorField(
     padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
     cbar ['5%'] ................. : size of the colorbar in percent of x-axis (None = no colorbar)
     cbar_pad [0.05] ............. : padding of the colorbar
-    **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
+    **kwargs .................... : standard matplotlib kwargs passed to `ax.imshow`
     """
     import myplotlib.tools.lic as lic
     import matplotlib

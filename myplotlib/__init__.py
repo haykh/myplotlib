@@ -1,4 +1,4 @@
-__version__ = "1.3.0"
+__version__ = "1.4.0"
 
 CUSTOM_CMAPS = []
 
@@ -46,7 +46,7 @@ def __InstallCmapFromCSV(csv):
         )
 
 
-def load(style=None, flavor="light"):
+def load(style=None, flavor="light", usetex=True):
     """
     `myplotlib.load`
 
@@ -55,11 +55,14 @@ def load(style=None, flavor="light"):
     args
     ----------
     style [None] ............. : style to load (options: None, 'fancy', 'mono', 'hershey')
-    flavor ['light'] ............ : color flavor to load (options: 'light', 'dark')
+    flavor ['light'] ......... : color flavor to load (options: 'light', 'dark')
+    usetex [True] ............ : whether to use LaTeX (True/False)
     """
     import os
     from matplotlib import font_manager
     import matplotlib.pyplot as plt
+
+    assert usetex or style != "fancy", "fancy style requires usetex=True"
 
     CMAP_DIR = os.path.join(os.path.dirname(__file__), "assets/colormaps")
     CMAPS = os.listdir(CMAP_DIR)
@@ -75,3 +78,8 @@ def load(style=None, flavor="light"):
             os.path.dirname(__file__), f"assets/{style}.{flavor}.mplstyle"
         )
         plt.style.use(MPLSTYLE_FILE)
+    if usetex and not style == "fancy":
+        LATEXSTILE_FILE = os.path.join(
+            os.path.dirname(__file__), f"assets/latex.mplstyle"
+        )
+        plt.style.use(LATEXSTILE_FILE)

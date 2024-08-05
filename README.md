@@ -13,10 +13,11 @@ pip install myplotlib
 ```python
 # initialize style:
 import myplotlib
-myplotlib.load(style=..., flavor=...)
+myplotlib.load(style=..., flavor=..., usetex=...)
 # style can be [None | `fancy` | `mono` | `hershey`]
 # flavor can be [None | `light` | `dark`]
-# if not specified defaults to `style = None, flavor = None`
+# usetex can be [True | False]
+# if not specified defaults to `style = None, flavor = None, usetex = True`
 
 # auxiliary functions for plotting:
 import myplotlib.plots as myplt
@@ -34,7 +35,7 @@ for more usage examples checkout the `tests/` submodule.
 ### requirements
 
 * `python >= 3.8`
-* `matplotlib >= 3.0.0`, `numpy`
+* `matplotlib >= 3.5.0`, `numpy`
 * `latex` (used for `style="fancy"` only)
 * `numba>=0.57.0`
 

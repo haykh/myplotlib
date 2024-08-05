@@ -11,7 +11,7 @@ if __name__ == "__main__":
     for st, fl in [
         f.replace(".mplstyle", "").split(".")
         for f in os.listdir("myplotlib/assets")
-        if f.endswith(".mplstyle")
+        if f.endswith(".mplstyle") and f.count(".") == 2
     ]:
         mpl.rcParams.update(mpl.rcParamsDefault)
         myplotlib.load(st, fl)
