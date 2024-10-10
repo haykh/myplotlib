@@ -247,8 +247,11 @@ def plot2d(
     if cbar is not None:
         divider = make_axes_locatable(ax)
         cax = divider.append_axes(cbar_pos, size=cbar, pad=cbar_pad)
-        colorbar = plt.colorbar(ax.get_images()[0], cax=cax,
-                                orientation="vertical" if cbar_pos in ["left", "right"] else "horizontal")
+        colorbar = plt.colorbar(
+            ax.get_images()[0],
+            cax=cax,
+            orientation="vertical" if cbar_pos in ["left", "right"] else "horizontal",
+        )
         if cbar_pos == "left":
             cax.yaxis.set_ticks_position("left")
             cax.yaxis.set_label_position("left")
@@ -387,3 +390,111 @@ def plotVectorField(
         alpha=lic_opacity,
     )
     return colorbar
+
+
+def plot2dGrid(
+    x,
+    y,
+    fields,
+    panels,
+    label_pos="title",
+    label_args={},
+    width=10,
+    dpi=150,
+    wspace=0.05,
+    hspace=0.05,
+    **kwargs,
+):
+    """
+    add a grid of 2d plots with shared axes
+
+    args
+    ----------
+    x, y ........................ : 1d or 2d arrays of coordinates
+    fields ...................... : dictionary of all the fields
+    panels ...................... : array of array of dictionaries indicating the panels to plot (see note below)
+    label_pos ['title'] ......... : position of the label ('title', 'cbar', 'text', None)
+    label_args [{}] ............. : arguments for the label (color, fontsize, etc; passed to `ax.set_title`, )
+
+    arguments for the figure
+    ----------
+    width [10] .................. : width of the figure in inches
+    dpi [150] ................... : resolution of the figure [dots per inch]
+    wspace [0.05] ............... : width space between the panels (as fraction of the panel width)
+    hspace [0.05] ............... : height space between the panels (as fraction of the panel height)
+
+    the rest of the args are the same as for the `plot2d`
+    ----------
+    force_aspect [True] ......... : force equal aspect ratio according to axes
+    centering ['edge'] .......... : centering of x & y nodes for the data ('edge', 'center')
+    xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from x & y)
+    padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
+    cbar ['5%'] ................. : size of the colorbar in percent of x-axis (None = no colorbar)
+    cbar_pad [0.05] ............. : padding of the colorbar
+    **kwargs .................... : standard matplotlib kwargs passed to `ax.imshow`
+
+    note
+    ----------
+    the `panels` is an `n x m` array, where `n` is the number of rows and `m` is the number of columns.
+    each element of the array is a dictionary with the following keys:
+        - 'label' ............... : label for the field
+        - 'field' ............... : lambda function which takes the `fields` dictionary and returns the quantity to plot
+        - 'cmap' ................ : colormap of the panel
+        - 'norm' ................ : normalization object
+    """
+    import matplotlib.pyplot as plt
+
+    assert len(panels) > 0, "no panels to plot"
+    assert len(panels[0]) > 0, "no panels to plot"
+    assert all(
+        [len(row) == len(panels[0]) for row in panels]
+    ), "all rows must have the same number of panels"
+    assert label_pos in ["title", "cbar", "text", None], "invalid label position"
+
+    ncols = len(panels[0])
+    nrows = len(panels)
+
+    xlims = kwargs.get("xlim", (x.min(), x.max()))
+    ylims = kwargs.get("ylim", (y.min(), y.max()))
+    aspect = (xlims[1] - xlims[0]) / (ylims[1] - ylims[0])
+    height = (
+        width
+        * ((nrows + hspace * (nrows - 1)) / (ncols + wspace * (ncols - 1)))
+        / aspect
+    )
+
+    fig = plt.figure(figsize=(width, height), dpi=dpi)
+
+    gs = fig.add_gridspec(nrows, ncols, wspace=wspace, hspace=hspace)
+    axs = [[fig.add_subplot(gs[i, j]) for j in range(ncols)] for i in range(nrows)]
+
+    label_coords = label_args.pop("position", (0.05, 0.95))
+
+    for i in range(nrows):
+        for j in range(ncols):
+            ax = axs[i][j]
+            panel = panels[i][j]
+
+            cbar = plot2d(
+                ax,
+                x,
+                y,
+                panel["field"](fields),
+                norm=panel["norm"],
+                cmap=panel["cmap"],
+                **kwargs,
+            )
+
+            if j != 0:
+                ax.set(ylabel=None, yticklabels=[])
+            if i != nrows - 1:
+                ax.set(xlabel=None, xticklabels=[])
+
+            if label_pos == "title":
+                ax.set_title(panel["label"], **label_args)
+            elif label_pos == "cbar":
+                cbar.set_label(panel["label"], **label_args)
+            elif label_pos == "text":
+                ax.text(
+                    *label_coords, panel["label"], transform=ax.transAxes, **label_args
+                )

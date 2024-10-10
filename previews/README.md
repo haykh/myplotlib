@@ -22,7 +22,11 @@
 
 ![fancy_dark](fancy_dark.jpg)
 
-# `None`
+# `Latex`
 
-![None](None.jpg)
+![Latex](latex.jpg)
+
+# `Plain`
+
+![Plain](plain.jpg)
 
