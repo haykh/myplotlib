@@ -10,19 +10,36 @@ pip install myplotlib
 
 ### usage
 
-```python
-# initialize style:
-import myplotlib
-myplotlib.load(style=..., flavor=..., usetex=...)
-# style can be [None | `fancy` | `mono` | `hershey`]
-# flavor can be [None | `light` | `dark`]
-# usetex can be [True | False]
-# if not specified defaults to `style = None, flavor = None, usetex = True`
+#### loading style, fonts & colormaps
 
-# auxiliary functions for plotting:
+```python
+import myplotlib
+import matplotlib.pyplot as plt
+
+plt.style.use(STYLE)
+# STYLE can be:
+# - fancy.dark, fancy.light
+# - hershey.dark, hershey.light
+# - mono.dark, mono.light
+# - latex
+
+# you may also combine the styles:
+plt.style.use([STYLE1, STYLE2])
+
+# and you can temporarily load the style:
+with plt.style.context(STYLE):
+    plt.plot(...)
+```
+
+#### auxiliary plotting functions
+
+```python
 import myplotlib.plots as myplt
 # type for docstring:
 myplt?
+
+# for specific function:
+myplt.plot2d?
 
 # preview custom styles with built-in functions
 import myplotlib.tests as mypltest

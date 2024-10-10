@@ -1,5 +1,4 @@
 import os
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 import myplotlib
@@ -13,17 +12,19 @@ if __name__ == "__main__":
         for f in os.listdir("myplotlib/assets")
         if f.endswith(".mplstyle") and f.count(".") == 2
     ]:
-        mpl.rcParams.update(mpl.rcParamsDefault)
-        myplotlib.load(st, fl)
-        mypltests.testAll()
-        plt.savefig(f"previews/{st}_{fl}.jpg")
-        readme += f"# `{st}.{fl}`\n\n![{st}_{fl}]({st}_{fl}.jpg)\n\n"
+        with plt.style.context(f"{st}.{fl}"):
+            mypltests.testAll()
+            plt.savefig(f"previews/{st}_{fl}.jpg")
+            readme += f"# `{st}.{fl}`\n\n![{st}_{fl}]({st}_{fl}.jpg)\n\n"
 
-    mpl.rcParams.update(mpl.rcParamsDefault)
-    myplotlib.load(None, None)
+    with plt.style.context("latex"):
+        mypltests.testAll()
+        plt.savefig(f"previews/latex.jpg")
+        readme += f"# `Latex`\n\n![Latex](latex.jpg)\n\n"
+
     mypltests.testAll()
-    plt.savefig(f"previews/None.jpg")
-    readme += f"# `None`\n\n![None](None.jpg)\n\n"
+    plt.savefig(f"previews/plain.jpg")
+    readme += f"# `Plain`\n\n![Plain](plain.jpg)\n\n"
 
     with open("previews/README.md", "w") as f:
         f.write(readme)

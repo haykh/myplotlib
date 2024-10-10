@@ -1,6 +1,11 @@
-__version__ = "1.4.0"
+__version__ = "1.5.0"
 
-CUSTOM_CMAPS = []
+
+import os
+import matplotlib.pyplot as plt
+from matplotlib import font_manager
+
+import myplotlib
 
 
 def __RGBToPyCmap(rgbdata):
@@ -20,6 +25,9 @@ def __RGBToPyCmap(rgbdata):
         bdata.append((stepaxis[istep], b, b))
     mpl_data = {"red": rdata, "green": gdata, "blue": bdata}
     return mpl_data
+
+
+CUSTOM_CMAPS = []
 
 
 def __InstallCmapFromCSV(csv):
@@ -46,40 +54,23 @@ def __InstallCmapFromCSV(csv):
         )
 
 
-def load(style=None, flavor="light", usetex=True):
-    """
-    `myplotlib.load`
+myplotlib_path = myplotlib.__path__[0]
+styles_path = os.path.join(myplotlib_path, "assets")
 
-    preload custom style
+stylesheets = {}
+for folder, _, _ in os.walk(styles_path):
+    new_stylesheets = plt.style.core.read_style_directory(folder)
+    stylesheets.update(new_stylesheets)
 
-    args
-    ----------
-    style [None] ............. : style to load (options: None, 'fancy', 'mono', 'hershey')
-    flavor ['light'] ......... : color flavor to load (options: 'light', 'dark')
-    usetex [True] ............ : whether to use LaTeX (True/False)
-    """
-    import os
-    from matplotlib import font_manager
-    import matplotlib.pyplot as plt
+plt.style.core.update_nested_dict(plt.style.library, stylesheets)
+plt.style.core.available[:] = sorted(plt.style.library.keys())
 
-    assert usetex or style != "fancy", "fancy style requires usetex=True"
-
-    CMAP_DIR = os.path.join(os.path.dirname(__file__), "assets/colormaps")
-    CMAPS = os.listdir(CMAP_DIR)
-    for cmap in CMAPS:
-        cmapname = os.path.join(CMAP_DIR, cmap)
-        __InstallCmapFromCSV(cmapname)
-    FONT_DIR = os.path.join(os.path.dirname(__file__), "assets/fonts")
-    font_files = font_manager.findSystemFonts(fontpaths=[FONT_DIR])
-    for font_file in font_files:
-        font_manager.fontManager.addfont(font_file)
-    if style is not None:
-        MPLSTYLE_FILE = os.path.join(
-            os.path.dirname(__file__), f"assets/{style}.{flavor}.mplstyle"
-        )
-        plt.style.use(MPLSTYLE_FILE)
-    if usetex and not style == "fancy":
-        LATEXSTILE_FILE = os.path.join(
-            os.path.dirname(__file__), f"assets/latex.mplstyle"
-        )
-        plt.style.use(LATEXSTILE_FILE)
+CMAP_DIR = os.path.join(myplotlib_path, "assets/colormaps")
+CMAPS = os.listdir(CMAP_DIR)
+for cmap in CMAPS:
+    cmapname = os.path.join(CMAP_DIR, cmap)
+    __InstallCmapFromCSV(cmapname)
+FONT_DIR = os.path.join(myplotlib_path, "assets/fonts")
+font_files = font_manager.findSystemFonts(fontpaths=[FONT_DIR])
+for font_file in font_files:
+    font_manager.fontManager.addfont(font_file)
