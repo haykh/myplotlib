@@ -62,13 +62,13 @@ when deploying a new version, there are three necessary steps to take.
 
 1. increase the version string in `myplotlib/__init__.py`.
 2. generate the previews:
-  ```sh
-  python3 previews/export_previews.py
-  ```
+    ```sh
+    python3 previews/export_previews.py
+    ```
 3. build the new tarballs in the `dist` directory:
-  ```sh
-  python -m build --sdist --outdir dist .
-  ```
+    ```sh
+    python -m build --sdist --outdir dist .
+    ```
 
 ## To-do
 
