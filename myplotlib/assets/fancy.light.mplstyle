@@ -1,4 +1,5 @@
-figure.dpi: 150
+axes.prop_cycle: cycler('color', ["389ed0","ef5946","06b15c","fab54e","9d67a2","545e56","e22850","0d3b66"])
+
 axes.axisbelow: True
 axes.grid: False
 grid.linewidth: 0.2
@@ -6,13 +7,26 @@ xtick.direction: out
 ytick.direction: out
 grid.alpha: 0.2
 
+axes.labelsize: 16
+
+# tex
 text.usetex: True
 text.latex.preamble: \usepackage{amsmath,bm,xcolor,ebgaramond-maths}
 
-font.family: EB Garamond
+#fonts
+font.size: 14
+
+font.serif: EB Garamond
+font.sans-serif: EB Garamond
+font.monospace: EB Garamond
+
+font.family: serif
+
+# font.family: EB Garamond
 mathtext.fontset: custom
+mathtext.default: it
 mathtext.rm: EB Garamond
 mathtext.it: EB Garamond:italic
 mathtext.bf: EB Garamond:bold
-
-axes.prop_cycle: cycler('color', ["389ed0","ef5946","06b15c","fab54e","9d67a2","545e56","e22850","0d3b66"])
+mathtext.sf: EB Garamond:medium
+mathtext.tt: EB Garamond:light

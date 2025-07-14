@@ -1,3 +1,5 @@
+axes.prop_cycle: cycler('color', ["8bc6e4","f48a7c","3af899","fccd88","be9ac1","7d8c80","e95d7c","2688e3"])
+
 figure.dpi: 150
 axes.axisbelow: True
 axes.grid: False
@@ -7,5 +9,3 @@ ytick.direction: out
 grid.alpha: 0.2
 
 font.family: monospace
-
-axes.prop_cycle: cycler('color', ["389ed0","ef5946","06b15c","fab54e","9d67a2","545e56","e22850","0d3b66"])

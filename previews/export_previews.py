@@ -14,17 +14,17 @@ if __name__ == "__main__":
     ]:
         with plt.style.context(f"{st}.{fl}"):
             mypltests.testAll()
-            plt.savefig(f"previews/{st}_{fl}.jpg")
-            readme += f"# `{st}.{fl}`\n\n![{st}_{fl}]({st}_{fl}.jpg)\n\n"
+            plt.savefig(f"previews/{st}_{fl}.png", dpi=300)
+            readme += f"# `{st}.{fl}`\n\n![{st}_{fl}]({st}_{fl}.png)\n\n"
 
     with plt.style.context("latex"):
         mypltests.testAll()
-        plt.savefig(f"previews/latex.jpg")
-        readme += f"# `Latex`\n\n![Latex](latex.jpg)\n\n"
+        plt.savefig(f"previews/latex.png", dpi=300)
+        readme += f"# `Latex`\n\n![Latex](latex.png)\n\n"
 
     mypltests.testAll()
-    plt.savefig(f"previews/plain.jpg")
-    readme += f"# `Plain`\n\n![Plain](plain.jpg)\n\n"
+    plt.savefig(f"previews/plain.png", dpi=300)
+    readme += f"# `Plain`\n\n![Plain](plain.png)\n\n"
 
     with open("previews/README.md", "w") as f:
         f.write(readme)

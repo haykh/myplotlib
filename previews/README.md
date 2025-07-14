@@ -1,32 +1,32 @@
-# `mono.dark`
+# `classic.light`
 
-![mono_dark](mono_dark.jpg)
-
-# `mono.light`
-
-![mono_light](mono_light.jpg)
-
-# `hershey.light`
-
-![hershey_light](hershey_light.jpg)
-
-# `hershey.dark`
-
-![hershey_dark](hershey_dark.jpg)
+![classic_light](classic_light.png)
 
 # `fancy.light`
 
-![fancy_light](fancy_light.jpg)
+![fancy_light](fancy_light.png)
+
+# `classic.dark`
+
+![classic_dark](classic_dark.png)
+
+# `mono.light`
+
+![mono_light](mono_light.png)
 
 # `fancy.dark`
 
-![fancy_dark](fancy_dark.jpg)
+![fancy_dark](fancy_dark.png)
+
+# `mono.dark`
+
+![mono_dark](mono_dark.png)
 
 # `Latex`
 
-![Latex](latex.jpg)
+![Latex](latex.png)
 
 # `Plain`
 
-![Plain](plain.jpg)
+![Plain](plain.png)
 

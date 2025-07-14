@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "tamasfe.even-better-toml",
+    "yy0931.mplstyle",
+    "ms-python.black-formatter",
+    "ms-python.python"
+  ]
+}

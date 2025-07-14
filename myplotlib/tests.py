@@ -13,6 +13,7 @@ commands to help preview the custom styles (function names are self-descriptive)
 
 * testAll
 """
+
 import myplotlib.plots as myplt
 import myplotlib
 
@@ -37,7 +38,7 @@ def testColormaps(ax=None):
         y1, y2 = (pady * (i + 0.5) + dy * i, pady * (i + 0.5) + dy * (i + 1))
         ax.imshow(zz, extent=(0, 1, y1, y2), cmap=cm)
         if matplotlib.rcParams["text.usetex"]:
-            name = r"$\texttt{{'{}'}}$".format(cm)
+            name = r"$\texttt{{`{}'}}$".format(cm)
         else:
             name = f"'{cm}'"
         ax.text(1.04, 0.5 * (y1 + y2), name, va="center", ha="left")
@@ -57,9 +58,9 @@ def testColors(ax=None):
         th = np.linspace(0, 2 * np.pi, 512)
         ax.plot(th, 0.1 * np.sin(th) + v_offset, color=c, lw=2)
         if matplotlib.rcParams["text.usetex"]:
-            name = r"$\texttt{{'C{}'}}$".format(j)
+            name = r"$\texttt{{`C{}'}}$".format(j)
         else:
-            name = f"'C{j}'"
+            name = f"`C{j}'"
         ax.annotate(
             name,
             (0, v_offset),
@@ -70,7 +71,7 @@ def testColors(ax=None):
             textcoords="offset points",
         )
         if matplotlib.rcParams["text.usetex"]:
-            name = r"$\texttt{{{}}}$".format(c.replace("#", "\#"))
+            name = r"$\texttt{{{}}}$".format(c.replace("#", r"\#"))
         else:
             name = f"{c}"
         ax.annotate(
@@ -110,7 +111,14 @@ def testScatter(ax=None):
         ylim=(1e-2, None),
         xlim=(1e-2, None),
     )
-    plt.legend(loc="lower left")
+    # label top left @ outside
+    ax.legend(
+        loc="upper left",
+        bbox_to_anchor=(0, 1.15),
+        borderaxespad=0.0,
+        ncol=2,
+        frameon=False,
+    )
     ax.set_xlabel(r"some funny number $x^2/y$ [units]")
     ax.set_ylabel(r"other number $z_{\nu}$ [units]")
 

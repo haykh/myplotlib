@@ -2,15 +2,15 @@
 
 `matplotlib` binder with custom styles and routines for fast plotting. see [previews of available styles](https://github.com/haykh/myplotlib/tree/master/previews#readme).
 
-### installation
+## installation
 
 ```shell
 pip install myplotlib
 ```
 
-### usage
+## usage
 
-#### loading style, fonts & colormaps
+### loading style, fonts & colormaps
 
 ```python
 import myplotlib
@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 plt.style.use(STYLE)
 # STYLE can be:
 # - fancy.dark, fancy.light
-# - hershey.dark, hershey.light
+# - classic.dark, classic.light
 # - mono.dark, mono.light
 # - latex
 
@@ -31,7 +31,7 @@ with plt.style.context(STYLE):
     plt.plot(...)
 ```
 
-#### auxiliary plotting functions
+### auxiliary plotting functions
 
 ```python
 import myplotlib.plots as myplt
@@ -49,22 +49,28 @@ mypltest?
 
 for more usage examples checkout the `tests/` submodule.
 
-### requirements
+## requirements
 
 * `python >= 3.8`
 * `matplotlib >= 3.5.0`, `numpy`
-* `latex` (used for `style="fancy"` only)
+* `latex` (used for `fancy` and `latex` only)
 * `numba>=0.57.0`
 
-### development
+## development
 
-Building tarballs in the `dist` directory:
+when deploying a new version, there are three necessary steps to take.
 
-```sh
-python -m build --sdist --outdir dist .
-```
+1. increase the version string in `myplotlib/__init__.py`.
+2. generate the previews:
+  ```sh
+  python3 previews/export_previews.py
+  ```
+3. build the new tarballs in the `dist` directory:
+  ```sh
+  python -m build --sdist --outdir dist .
+  ```
 
-### To-do
+## To-do
 
 - [ ] isocontour plotting
 - [x] add streamplot for fieldline plotting
