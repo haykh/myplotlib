@@ -12,27 +12,56 @@ a collection of handy plotting functions bound around `matplotlib` with lots of 
 docstrings are available for all of the functions. type, e.g., `dataPlot?` to read about the arguments passed.
 """
 
+from typing import TypeAlias, Any, TypedDict, Callable
 import numpy as np
+import matplotlib.colors as mcolors
+from matplotlib.axes._axes import Axes as pltAxes
+
+LimTypeWithNone: TypeAlias = tuple[float | None, float | None] | None
+LimType: TypeAlias = tuple[float, float]
 
 
-def __stretch(left, right, pad):
+def __stretch(
+    left: float,
+    right: float,
+    pad: float,
+) -> LimType:
+    """stretch the limits by a padding factor"""
     c = 0.5 * (left + right)
     d = 0.5 * (right - left)
     return (c - d * pad, c + d * pad)
 
 
-def __setMinMax(lims, data):
-    if not lims:
-        lims = (np.nanmin(data), np.nanmax(data))
-    if lims[0] == None:
-        lims = (np.nanmin(data), lims[1])
-    if lims[1] == None:
-        lims = (lims[0], np.nanmax(data))
-    return lims
+def __setMinMax(
+    lims: LimTypeWithNone,
+    data: np.ndarray,
+) -> LimType:
+    """set the limits of the axis according to the data and the passed limits"""
+    if lims is None:
+        return (np.nanmin(data), np.nanmax(data))
+    assert (
+        isinstance(lims, tuple) and len(lims) == 2
+    ), "lims must be a tuple of length 2"
+    if lims[0] is None and lims[1] is None:
+        return (np.nanmin(data), np.nanmax(data))
+    if lims[0] is None and lims[1] is not None:
+        return (np.nanmin(data), lims[1])
+    if lims[1] is None and lims[0] is not None:
+        return (lims[0], np.nanmax(data))
+    assert lims[0] is not None and lims[1] is not None, "lims must not be None"
+    return (lims[0], lims[1])
 
 
-def __setAxLims(ax, coords, log, pad, lim, spines):
-    lim = __setMinMax(lim, coords)
+def __setAxLims(
+    ax: pltAxes,
+    coords,
+    log: bool,
+    pad: float,
+    lims: LimTypeWithNone,
+    spines: str,
+):
+    """set the limits of the axis according to the data and the passed limits"""
+    lim = __setMinMax(lims, coords)
     # TODO: fix negative when log specified
     if pad > 0:
         ax.spines[spines].set_bounds(*lim)
@@ -43,7 +72,7 @@ def __setAxLims(ax, coords, log, pad, lim, spines):
         func_setscale = ax.set_yscale
         func_setlim = ax.set_ylim
     else:
-        raise ValueError
+        raise ValueError(f"invalid `spines` value: {spines}")
     if log:
         func_setscale("log")
         p1, p2 = lim
@@ -57,7 +86,12 @@ def __setAxLims(ax, coords, log, pad, lim, spines):
         func_setlim(*__stretch(p1, p2, 1.0 + pad))
 
 
-def __checkDimensions2d(x, y, zz):
+def __checkDimensions2d(
+    x: np.ndarray,
+    y: np.ndarray,
+    zz: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """check the dimensions of the passed 2d arrays and return them as 1d arrays"""
     x, y, zz = (
         np.array(np.squeeze(x)),
         np.array(np.squeeze(y)),
@@ -83,7 +117,11 @@ def __checkDimensions2d(x, y, zz):
     return (x, y, zz)
 
 
-def __findExtent(x, y, centering):
+def __findExtent(
+    x: np.ndarray,
+    y: np.ndarray,
+    centering: str,
+) -> tuple[float, float, float, float]:
     if centering == "edge":
         dx = x[1] - x[0]
         dy = y[1] - y[0]
@@ -103,30 +141,42 @@ def __findExtent(x, y, centering):
 
 
 def dataPlot(
-    function,
-    ax,
-    x,
-    y,
-    xlog=False,
-    ylog=False,
-    xlim=None,
-    ylim=None,
-    padx=0.0,
-    pady=0.0,
+    function: Callable,
+    ax: pltAxes,
+    x: np.ndarray,
+    y: np.ndarray,
+    xlog: bool = False,
+    ylog: bool = False,
+    xlim: LimTypeWithNone = None,
+    ylim: LimTypeWithNone = None,
+    padx: float = 0.0,
+    pady: float = 0.0,
     **kwargs,
 ):
-    """
-    add a plot according to a passed function
+    """Add a plot according to a passed function
 
-    args
-    ----------
-    function .................... : `ax.<METHOD>` used to make the plot (e.g. `ax.step`, `ax.errorbar`)
-    ax .......................... : matplotlib axis object
-    x, y ........................ : 1d data arrays
-    xlog [False], ylog [False] .. : use log in x or y direction
-    xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from data)
-    padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
-    **kwargs .................... : standard matplotlib kwargs passed to `ax.<function>`
+    Args
+    ----
+    function : Callable
+        The function to call on the axis (e.g., `ax.plot`, `ax.scatter`).
+    ax : pltAxes
+        The matplotlib axis object.
+    x, y : np.ndarray
+        The data to plot.
+    xlog : bool, optional
+        Use logarithmic scale for x-axis (default is False).
+    ylog : bool, optional
+        Use logarithmic scale for y-axis (default is False).
+    xlim : tuple[float | None, float | None] | None, optional
+        Tuple of x limits (None = determine from data) (default is None).
+    ylim : tuple[float | None, float | None] | None, optional
+        Tuple of y limits (None = determine from data) (default is None).
+    padx : float, optional
+        Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
+    pady : float, optional
+        Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
+    **kwargs : dict, optional
+        Standard matplotlib kwargs passed to `function`.
     """
     if padx != 0:
         ax.spines["top"].set_visible(False)
@@ -139,85 +189,145 @@ def dataPlot(
 
 
 def scatter(
-    ax, x, y, xlog=False, ylog=False, xlim=None, ylim=None, padx=0.0, pady=0.0, **kwargs
+    ax: pltAxes,
+    x: np.ndarray,
+    y: np.ndarray,
+    xlog: bool = False,
+    ylog: bool = False,
+    xlim: LimTypeWithNone = None,
+    ylim: LimTypeWithNone = None,
+    padx: float = 0.0,
+    pady: float = 0.0,
+    **kwargs,
 ):
-    """
-    add a scatter plot to a given axis (same as `dataPlot(ax.scatter, ...)`)
+    """Add a scatter plot to a given axis
 
-    args
-    ----------
-    ax .......................... : matplotlib axis object
-    x, y ........................ : 1d data arrays
-    xlog [False], ylog [False] .. : use log in x or y direction
-    xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from data)
-    padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
-    **kwargs .................... : standard matplotlib kwargs passed to `ax.scatter`
+    Args
+    ----
+    ax : pltAxes
+        The matplotlib axis object.
+    x, y : np.ndarray
+        The data to plot.
+    xlog : bool, optional
+        Use logarithmic scale for x-axis (default is False).
+    ylog : bool, optional
+        Use logarithmic scale for y-axis (default is False).
+    xlim : LimTypeWithNone, optional
+        Tuple of x limits (None = determine from data) (default is None).
+    ylim : LimTypeWithNone, optional
+        Tuple of y limits (None = determine from data) (default is None).
+    padx : float, optional
+        Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
+    pady : float, optional
+        Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
+    **kwargs : dict, optional
+        Standard matplotlib kwargs passed to `ax.scatter`.
     """
     return dataPlot(ax.scatter, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
 
 
 def plot(
-    ax, x, y, xlog=False, ylog=False, xlim=None, ylim=None, padx=0.0, pady=0.0, **kwargs
+    ax: pltAxes,
+    x: np.ndarray,
+    y: np.ndarray,
+    xlog: bool = False,
+    ylog: bool = False,
+    xlim: LimTypeWithNone = None,
+    ylim: LimTypeWithNone = None,
+    padx: float = 0.0,
+    pady: float = 0.0,
+    **kwargs,
 ):
-    """
-    add a simple plot to a given axis (same as `dataPlot(ax.plot, ...)`)
+    """Add a plot to a given axis (same as `dataPlot(ax.plot, ...)`)
 
-    args
-    ----------
-    ax .......................... : matplotlib axis object
-    x, y ........................ : 1d data arrays
-    xlog [False], ylog [False] .. : use log in x or y direction
-    xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from data)
-    padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
-    **kwargs .................... : standard matplotlib kwargs passed to `ax.plot`
+    Args
+    ----
+    ax : pltAxes
+        The matplotlib axis object.
+    x, y : np.ndarray
+        The data to plot.
+    xlog : bool, optional
+        Use logarithmic scale for x-axis (default is False).
+    ylog : bool, optional
+        Use logarithmic scale for y-axis (default is False).
+    xlim : LimTypeWithNone, optional
+        Tuple of x limits (None = determine from data) (default is None).
+    ylim : LimTypeWithNone, optional
+        Tuple of y limits (None = determine from data) (default is None).
+    padx : float, optional
+        Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
+    pady : float, optional
+        Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
+    **kwargs : dict, optional
+        Standard matplotlib kwargs passed to `function`.
     """
     dataPlot(ax.plot, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
 
 
 def plot2d(
-    ax,
-    x,
-    y,
-    zz,
-    force_aspect=True,
-    centering="edge",
-    xlim=None,
-    ylim=None,
-    zlog=False,
-    zlim=None,
-    padx=0.0,
-    pady=0.0,
-    cbar="5%",
-    cbar_pad=0.05,
-    cbar_pos="right",
+    ax: pltAxes,
+    x: np.ndarray,
+    y: np.ndarray,
+    zz: np.ndarray,
+    force_aspect: bool = True,
+    centering: str = "edge",
+    xlim: LimTypeWithNone = None,
+    ylim: LimTypeWithNone = None,
+    zlog: bool = False,
+    zlim: LimTypeWithNone = None,
+    padx: float = 0.0,
+    pady: float = 0.0,
+    cbar: str | None = "5%",
+    cbar_pad: float = 0.05,
+    cbar_pos: str = "right",
     **kwargs,
 ):
-    """
-    add a 2d plot to a given axis
+    """Add a 2d plot to a given axis
 
-    args
-    ----------
-    ax .......................... : matplotlib axis object
-    x, y ........................ : 1d or 2d arrays of coordinates
-    force_aspect [True] ......... : force equal aspect ratio according to axes
-    centering ['edge'] .......... : centering of x & y nodes for the data ('edge', 'center')
-    xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from x & y)
-    zlog [False] ................ : use log in z ('True', 'False')
-    zlim [None] ................. : tuple of z limits (None = determine from z)
-    padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
-    cbar ['5%'] ................. : size of the colorbar in percent of x-axis (None = no colorbar)
-    cbar_pad [0.05] ............. : padding of the colorbar
-    cbar_pos ['right'] .......... : position of the colorbar ('left', 'right', 'top', 'bottom')
-    **kwargs .................... : standard matplotlib kwargs passed to `ax.imshow`
+    Args
+    ----
+    ax : matplotlib axis object
+        The axis to plot on.
+    x, y : 1d or 2d arrays of coordinates
+        The coordinates of the data to plot.
+    force_aspect : bool, optional
+        Force equal aspect ratio according to axes (default is True).
+    centering : str, optional
+        Centering of x & y nodes for the data ('edge', 'center') (default is 'edge').
+    xlim : tuple of float, optional
+        Tuple of x limits (None = determine from x) (default is None).
+    ylim : tuple of float, optional
+        Tuple of y limits (None = determine from y) (default is None).
+    zlog : bool, optional
+        Use log in z ('True', 'False') (default is False).
+    zlim : tuple of float, optional
+        Tuple of z limits (None = determine from z) (default is None).
+    padx : float, optional
+        Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
+    pady : float, optional
+        Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
+    cbar : str or None, optional
+        Size of the colorbar in percent of x-axis (None = no colorbar) (default is '5%').
+    cbar_pad : float, optional
+        Padding of the colorbar (default is 0.05).
+    cbar_pos : str, optional
+        Position of the colorbar ('left', 'right', 'top', 'bottom') (default is 'right').
+    **kwargs : dict, optional
+        Standard matplotlib kwargs passed to `ax.imshow`.
 
-    returns
-    ----------
-    `None` ...................... : if `cbar` is `None`
-    colorbar handle ............. : if `cbar` is not `None`
+    Returns
+    -------
+    None or colorbar handle
+        Returns `None` if `cbar` is `None`, otherwise returns the colorbar handle.
+
+    Raises
+    ------
+    AssertionError
+        If `centering` is not 'edge' or 'center', or if `cbar_pos` is not one of 'left', 'right', 'top', or 'bottom'.
+
     """
     from mpl_toolkits.axes_grid1 import make_axes_locatable
     import matplotlib.pyplot as plt
-    import matplotlib as mpl
 
     assert centering in ["edge", "center"], "invalid `centering`"
     assert cbar_pos in ["left", "right", "top", "bottom"], "invalid `cbar_pos`"
@@ -227,17 +337,23 @@ def plot2d(
     extent = __findExtent(x, y, centering)
     aspect = "auto" if not force_aspect else None
     if not ("norm" in kwargs):
-        if zlim is None:
-            vmax = np.quantile(zz[~np.isnan(zz) & ~np.isinf(zz)], 0.95)
-            vmin = np.quantile(zz[~np.isnan(zz) & ~np.isinf(zz)], 0.05)
+        zminQ = np.quantile(zz[~np.isnan(zz) & ~np.isinf(zz)], 0.05)
+        zmaxQ = np.quantile(zz[~np.isnan(zz) & ~np.isinf(zz)], 0.95)
+        if zlim is not None:
+            if zlim[0] is None:
+                vmin = zminQ
+            else:
+                vmin = zlim[0]
+            if zlim[1] is None:
+                vmax = zmaxQ
+            else:
+                vmax = zlim[1]
         else:
-            vmin, vmax = zlim
+            vmin, vmax = zminQ, zmaxQ
         if zlog:
-            if vmin < 0:
-                vmin = vmax / 1e6
-            norm = mpl.colors.LogNorm(vmin=vmin, vmax=vmax)
+            norm = mcolors.LogNorm(vmin=float(vmin), vmax=float(vmax))
         else:
-            norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+            norm = mcolors.Normalize(vmin=float(vmin), vmax=float(vmax))
     else:
         norm = kwargs.get("norm")
         kwargs.pop("norm")
@@ -269,30 +385,53 @@ def plot2d(
 
 
 def plotVectorField(
-    ax,
-    x,
-    y,
-    fx,
-    fy,
-    background=None,
-    texture_seed=None,
-    kernel_len=31,
-    kernel_pow=1,
-    lic_alphamin=0.5,
-    lic_alphamax=0.75,
-    lic_contrast=0.33,
-    lic_opacity=0.75,
-    lic_cmap="binary_r",
-    force_aspect=True,
-    centering="edge",
-    xlim=None,
-    ylim=None,
-    padx=0.0,
-    pady=0.0,
-    cbar="5%",
-    cbar_pad=0.05,
+    ax: pltAxes,
+    x: np.ndarray,
+    y: np.ndarray,
+    fx: np.ndarray,
+    fy: np.ndarray,
+    background: np.ndarray | None = None,
+    texture_seed: int | None = None,
+    kernel_len: int = 31,
+    kernel_pow: int = 1,
+    lic_alphamin: float = 0.5,
+    lic_alphamax: float = 0.75,
+    lic_contrast: float = 0.33,
+    lic_opacity: float = 0.75,
+    lic_cmap: str = "binary_r",
+    force_aspect: bool = True,
+    centering: str = "edge",
+    xlim: tuple[float, float] | None = None,
+    ylim: tuple[float, float] | None = None,
+    padx: float = 0.0,
+    pady: float = 0.0,
+    cbar: str | None = "5%",
+    cbar_pad: float = 0.05,
     **kwargs,
 ):
+    """Add a 2D plot with a vector-field overplotted
+    
+    Args
+    ----
+    ax : pltAxes
+        The matplotlib axis object.
+    x, y : np.ndarray
+        1D or 2D arrays of coordinates.
+    fx, fy : np.ndarray
+        2D arrays of the vector field components.
+    background : np.ndarray | None, optional
+        2D array of the image background (None = `sqrt(fx^2 + fy^2)`).
+    
+    texture_seed : int | None, optional
+        Specify a random seed to generate textures, useful when rendering movies (None = random).
+    kernel_len : int, optional
+        Kernel resolution for the LIC algorithm (default is 31).
+    kernel_pow : int, optional
+        Kernel sharpness for the LIC algorithm (default is 1).
+    lic_alphamin : float, optional
+            
+    """
+    
     """
     add a 2d plot with a vector-field overplotted
 
@@ -304,7 +443,7 @@ def plotVectorField(
     background [None] ........... : 2d array of the image background (None = `sqrt(fx^2 + fy^2)`)
 
     line integral convolution (lic) parameters
-    ----------
+    ---------
     texture_seed [None] ......... : specify a random seed to generate textures, useful when rendering movies (None = random)
     kernel_len [31] ............. : kernel resolution for the lic algorithm
     kernel_pow [1] .............. : kernel sharpness for the lic algorithm
@@ -348,14 +487,14 @@ def plotVectorField(
     _ = np.sign(weights - np.average(weights)) * np.sqrt(
         np.abs(weights - np.average(weights))
     )
-    alphas = matplotlib.colors.Normalize(None, None, clip=True)(_)
+    alphas = mcolors.Normalize(None, None, clip=True)(_)
     alphas[alphas < lic_alphamin] = 0
     alphas[alphas > lic_alphamax] = 1
     _ = (
         np.sign(weights - np.average(weights))
         * np.abs(weights - np.average(weights)) ** lic_contrast
     )
-    colors = matplotlib.colors.Normalize(None, None)(_)
+    colors = mcolors.Normalize(None, None)(_)
     colors = matplotlib.colormaps[lic_cmap](colors)
     colors[..., -1] = alphas
 
@@ -392,17 +531,24 @@ def plotVectorField(
     return colorbar
 
 
+class PanelDict(TypedDict):
+    label: str | None
+    field: Callable | None
+    cmap: str | None
+    norm: mcolors.Normalize | None
+
+
 def plot2dGrid(
-    x,
-    y,
-    fields,
-    panels,
-    label_pos="title",
-    label_args={},
-    width=10,
-    dpi=150,
-    wspace=0.05,
-    hspace=0.05,
+    x: np.ndarray,
+    y: np.ndarray,
+    fields: dict[str, np.ndarray],
+    panels: list[list[PanelDict]],
+    label_pos: str = "title",
+    label_args: dict[str, Any] = {},
+    width: float = 10,
+    dpi: int = 150,
+    wspace: float = 0.05,
+    hspace: float = 0.05,
     **kwargs,
 ):
     """
@@ -474,12 +620,14 @@ def plot2dGrid(
         for j in range(ncols):
             ax = axs[i][j]
             panel = panels[i][j]
-
+            assert "field" in panel, "panel must have a 'field' key"
+            field_func = panel["field"]
+            assert field_func is not None, "field must be a callable function"
             cbar = plot2d(
                 ax,
                 x,
                 y,
-                panel["field"](fields),
+                field_func(fields),
                 norm=panel["norm"],
                 cmap=panel["cmap"],
                 **kwargs,
@@ -491,10 +639,20 @@ def plot2dGrid(
                 ax.set(xlabel=None, xticklabels=[])
 
             if label_pos == "title":
-                ax.set_title(panel["label"], **label_args)
+                assert "label" in panel, "panel must have a 'label' key"
+                if panel["label"] is not None:
+                    ax.set_title(panel["label"], **label_args)
             elif label_pos == "cbar":
-                cbar.set_label(panel["label"], **label_args)
+                if cbar is not None:
+                    assert "label" in panel, "panel must have a 'label' key"
+                    if panel["label"] is not None:
+                        cbar.set_label(panel["label"], **label_args)
             elif label_pos == "text":
-                ax.text(
-                    *label_coords, panel["label"], transform=ax.transAxes, **label_args
-                )
+                assert "label" in panel, "panel must have a 'label' key"
+                if panel["label"] is not None:
+                    ax.text(
+                        *label_coords,
+                        s=panel["label"],
+                        transform=ax.transAxes,
+                        **label_args,
+                    )

@@ -18,6 +18,7 @@ import myplotlib.plots as myplt
 import myplotlib
 
 import matplotlib
+import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -200,7 +201,7 @@ def testVectorPlot2d(ax=None):
         ys,
         vectors[:, :, 0],
         vectors[:, :, 1],
-        norm=matplotlib.colors.LogNorm(1, 1e2),
+        norm=mcolors.LogNorm(1, 1e2),
         cmap="turbo",
         lic_contrast=1,
     )
