@@ -25,6 +25,8 @@
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
   ]
 
   [project.urls]
@@ -33,12 +35,8 @@
 [tool.hatch.version]
   path = "myplotlib/__init__.py"
 
-[tool.setuptools]
-  include-package-data = true
+[tool.hatch.build.targets.wheel]
+  packages = ["myplotlib"]
 
-  [tool.setuptools.packages.find]
-    where = [
-      "myplotlib/assets",
-      "myplotlib/assets/fonts",
-      "myplotlib/assets/colormaps",
-    ]
+[tool.hatch.build.targets.sdist]
+  include = ["myplotlib", "README.md", "LICENSE"]

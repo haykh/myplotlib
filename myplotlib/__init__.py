@@ -2,8 +2,10 @@ __version__ = "1.7.0"
 
 
 import os
+import warnings
+from pathlib import Path
 import matplotlib.pyplot as plt
-from matplotlib import font_manager
+from matplotlib import font_manager, rc_params_from_file
 
 import myplotlib
 
@@ -57,13 +59,14 @@ def __InstallCmapFromCSV(csv):
 myplotlib_path = myplotlib.__path__[0]
 styles_path = os.path.join(myplotlib_path, "assets")
 
-stylesheets = {}
-for folder, _, _ in os.walk(styles_path):
-    new_stylesheets = plt.style.core.read_style_directory(folder)
-    stylesheets.update(new_stylesheets)
-
-plt.style.core.update_nested_dict(plt.style.library, stylesheets)
-plt.style.core.available[:] = sorted(plt.style.library.keys())
+for path in Path(styles_path).rglob("*.mplstyle"):
+    with warnings.catch_warnings(record=True):
+        plt.style.library[path.stem] = rc_params_from_file(
+            path, use_default_template=False
+        )
+plt.style.available[:] = sorted(
+    name for name in plt.style.library if not name.startswith("_")
+)
 
 CMAP_DIR = os.path.join(myplotlib_path, "assets/colormaps")
 CMAPS = os.listdir(CMAP_DIR)
