@@ -1,15 +1,21 @@
-"""
-`myplotlib.plots`
+"""Convenience plotting helpers built around `matplotlib`.
 
-a collection of handy plotting functions bound around `matplotlib` with lots of nice perks.
-
-* dataPlot .................. : plot generic x & y 1d data (pass an `ax` method)
-* scatter ................... : scatter plot (`dataPlot` with `ax.scatter`)
-* plot ...................... : regular plot (`dataPlot` with `ax.plot`)
-* plot2d .................... : 2d plot using `imshow`
-* plotVectorField ........... : 2d plot with vector field
-
-docstrings are available for all of the functions. type, e.g., `dataPlot?` to read about the arguments passed.
+Functions
+---------
+dataPlot
+    Plot generic x and y data with a passed axis method.
+scatter
+    Add a scatter plot with shared limit/log handling.
+plot
+    Add a line plot with shared limit/log handling.
+plot2d
+    Add a 2D image plot with optional colorbar handling.
+plotVectorField
+    Add a 2D image plot with a line-integral-convolution vector overlay.
+hatchedCircle
+    Draw a circle shaded with engraving-style hatching.
+plot2dGrid
+    Add a grid of 2D plots with shared axes.
 """
 
 from typing import TypeAlias, Any, TypedDict, Callable, Union, Tuple
@@ -27,7 +33,22 @@ def __stretch(
     right: float,
     pad: float,
 ) -> LimType:
-    """stretch the limits by a padding factor"""
+    """Stretch limits around their midpoint by a padding factor.
+
+    Args
+    ----
+    left : float
+        The lower limit.
+    right : float
+        The upper limit.
+    pad : float
+        Multiplicative padding factor applied to the half-width.
+
+    Returns
+    -------
+    tuple[float, float]
+        The stretched lower and upper limits.
+    """
     c = 0.5 * (left + right)
     d = 0.5 * (right - left)
     return (c - d * pad, c + d * pad)
@@ -37,19 +58,42 @@ def __setMinMax(
     lims: LimTypeWithNone,
     data: Union[NDArray, list],
 ) -> LimType:
-    """set the limits of the axis according to the data and the passed limits"""
+    """Resolve axis limits from optional bounds and data.
+
+    Args
+    ----
+    lims : tuple[float | None, float | None] | None
+        Explicit lower and upper limits; `None` values are inferred from data.
+    data : NDArray | list
+        Data used to infer missing limits.
+
+    Returns
+    -------
+    tuple[float, float]
+        The resolved lower and upper limits.
+
+    Raises
+    ------
+    TypeError
+        If `lims` is not a tuple or `None`.
+    ValueError
+        If `lims` is not a tuple of length 2, or if it contains `None` values
+        when both limits are specified.
+    """
     if lims is None:
         return (np.nanmin(data), np.nanmax(data))
-    assert isinstance(lims, tuple) and len(lims) == 2, (
-        "lims must be a tuple of length 2"
-    )
+    if not isinstance(lims, tuple):
+        raise TypeError("lims must be a tuple of length 2 or None")
+    elif len(lims) != 2:
+        raise ValueError("lims must be a tuple of length 2")
     if lims[0] is None and lims[1] is None:
         return (np.nanmin(data), np.nanmax(data))
     if lims[0] is None and lims[1] is not None:
         return (np.nanmin(data), lims[1])
     if lims[1] is None and lims[0] is not None:
         return (lims[0], np.nanmax(data))
-    assert lims[0] is not None and lims[1] is not None, "lims must not be None"
+    if lims[0] is None or lims[1] is None:
+        raise ValueError("lims must not contain None values")
     return (lims[0], lims[1])
 
 
@@ -61,9 +105,38 @@ def __setAxLims(
     lims: LimTypeWithNone,
     spines: str,
 ):
-    """set the limits of the axis according to the data and the passed limits"""
+    """Set axis limits and scale from data, padding, and explicit bounds.
+
+    Args
+    ----
+    ax : pltAxes
+        The matplotlib axis object.
+    coords : NDArray | list
+        Coordinate values used to infer missing limits.
+    log : bool
+        Use logarithmic scaling for the selected axis.
+    pad : float
+        Fractional padding applied around the resolved limits.
+    lims : tuple[float | None, float | None] | None
+        Explicit axis limits; `None` values are inferred from `coords`.
+    spines : str
+        Axis spine to configure (`'bottom'` for x, `'left'` for y).
+
+    Raises
+    ------
+    ValueError
+        If `spines` is neither `'bottom'` nor `'left'`.
+    """
+    if log and (
+        lims is None or (isinstance(lims, tuple) and len(lims) == 2 and None in lims)
+    ):
+        coords = np.asarray(coords)
+        coords = coords[coords > 0]
+        if coords.size == 0:
+            raise ValueError("log scale requires positive coordinate values")
     lim = __setMinMax(lims, coords)
-    # TODO: fix negative when log specified
+    if log and (lim[0] <= 0 or lim[1] <= 0):
+        raise ValueError("log scale requires positive axis limits")
     if pad > 0:
         ax.spines[spines].set_bounds(*lim)
     if spines == "bottom":
@@ -92,29 +165,48 @@ def __checkDimensions2d(
     y: NDArray,
     zz: NDArray,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """check the dimensions of the passed 2d arrays and return them as 1d arrays"""
+    """Validate 2D field dimensions and return squeezed arrays.
+
+    Args
+    ----
+    x, y : NDArray
+        1D or 2D coordinate arrays.
+    zz : NDArray
+        2D scalar field or 3D RGB/RGBA image array.
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray, np.ndarray]
+        Squeezed `x`, `y`, and `zz` arrays with compatible dimensions.
+
+    Raises
+    ------
+    ValueError
+        If the coordinate and field shapes are incompatible.
+    """
     x, y, zz = (
         np.array(np.squeeze(x)),
         np.array(np.squeeze(y)),
         np.array(np.squeeze(zz)),
     )
     readShapes = f"`x.shape={x.shape}`, `y.shape={y.shape}`, `zz.shape={zz.shape}`"
-    assert len(x.shape) == len(y.shape), (
-        f"Shapes of `x` and `y` must be of the same dimension: {readShapes}."
-    )
+    if len(x.shape) != len(y.shape):
+        raise ValueError(
+            f"Shapes of `x` and `y` must be of the same dimension: {readShapes}."
+        )
     if len(x.shape) > 1:
         x = x[0, ...]
     if len(y.shape) > 1:
         y = y[..., 0]
-    assert (len(zz.shape) == 2) or (
-        len(zz.shape) == 3 and ((zz.shape[-1] == 3) or (zz.shape[-1] == 4))
-    ), f"`zz` must have exactly 2 non-trivial axes: {readShapes}."
-    assert zz.shape[1] == x.shape[0], (
-        f"incompatible dimensions between `x` and `zz`: {readShapes}."
-    )
-    assert zz.shape[0] == y.shape[0], (
-        f"incompatible dimensions between `y` and `zz`: {readShapes}."
-    )
+    if len(zz.shape) != 2 and (
+        len(zz.shape) != 3 or ((zz.shape[-1] != 3) and (zz.shape[-1] != 4))
+    ):
+        raise ValueError(f"`zz` must have exactly 2 non-trivial axes: {readShapes}.")
+
+    if zz.shape[1] != x.size:
+        raise ValueError(f"incompatible dimensions between `x` and `zz`: {readShapes}.")
+    if zz.shape[0] != y.size:
+        raise ValueError(f"incompatible dimensions between `y` and `zz`: {readShapes}.")
     return (x, y, zz)
 
 
@@ -123,6 +215,25 @@ def __findExtent(
     y: NDArray,
     centering: str,
 ) -> tuple[float, float, float, float]:
+    """Find the `imshow` extent for edge- or center-located samples.
+
+    Args
+    ----
+    x, y : NDArray
+        1D coordinate arrays.
+    centering : str
+        Coordinate convention (`'edge'` or `'center'`).
+
+    Returns
+    -------
+    tuple[float, float, float, float]
+        The image extent as `(left, right, bottom, top)`.
+
+    Raises
+    ------
+    ValueError
+        If `centering` is neither `'edge'` nor `'center'`.
+    """
     if centering == "edge":
         dx = x[1] - x[0]
         dy = y[1] - y[0]
@@ -178,15 +289,20 @@ def dataPlot(
         Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
     **kwargs : dict, optional
         Standard matplotlib kwargs passed to `function`.
+
+    Returns
+    -------
+    Any
+        The artist or handle returned by `function`.
     """
     if padx != 0:
         ax.spines["top"].set_visible(False)
     if pady != 0:
         ax.spines["right"].set_visible(False)
-    function(x, y, **kwargs)
+    handle = function(x, y, **kwargs)
     __setAxLims(ax, x, xlog, padx, xlim, "bottom")
     __setAxLims(ax, y, ylog, pady, ylim, "left")
-    return None
+    return handle
 
 
 def scatter(
@@ -223,6 +339,11 @@ def scatter(
         Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
     **kwargs : dict, optional
         Standard matplotlib kwargs passed to `ax.scatter`.
+
+    Returns
+    -------
+    PathCollection
+        The collection returned by `ax.scatter`.
     """
     return dataPlot(ax.scatter, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
 
@@ -260,9 +381,14 @@ def plot(
     pady : float, optional
         Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
     **kwargs : dict, optional
-        Standard matplotlib kwargs passed to `function`.
+        Standard matplotlib kwargs passed to `ax.plot`.
+
+    Returns
+    -------
+    list[Line2D]
+        The line artists returned by `ax.plot`.
     """
-    dataPlot(ax.plot, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
+    return dataPlot(ax.plot, ax, x, y, xlog, ylog, xlim, ylim, padx, pady, **kwargs)
 
 
 def plot2d(
@@ -287,27 +413,29 @@ def plot2d(
 
     Args
     ----
-    ax : matplotlib axis object
-        The axis to plot on.
-    x, y : 1d or 2d arrays of coordinates
+    ax : pltAxes
+        The matplotlib axis object.
+    x, y : NDArray
         The coordinates of the data to plot.
+    zz : NDArray
+        2D scalar field or 3D RGB/RGBA image array.
     force_aspect : bool, optional
         Force equal aspect ratio according to axes (default is True).
     centering : str, optional
         Centering of x & y nodes for the data ('edge', 'center') (default is 'edge').
-    xlim : tuple of float, optional
+    xlim : tuple[float | None, float | None] | None, optional
         Tuple of x limits (None = determine from x) (default is None).
-    ylim : tuple of float, optional
+    ylim : tuple[float | None, float | None] | None, optional
         Tuple of y limits (None = determine from y) (default is None).
     zlog : bool, optional
         Use log in z ('True', 'False') (default is False).
-    zlim : tuple of float, optional
+    zlim : tuple[float | None, float | None] | None, optional
         Tuple of z limits (None = determine from z) (default is None).
     padx : float, optional
         Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
     pady : float, optional
         Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
-    cbar : str or None, optional
+    cbar : str | None, optional
         Size of the colorbar in percent of x-axis (None = no colorbar) (default is '5%').
     cbar_pad : float, optional
         Padding of the colorbar (default is 0.05).
@@ -318,20 +446,23 @@ def plot2d(
 
     Returns
     -------
-    None or colorbar handle
+    Colorbar | None
         Returns `None` if `cbar` is `None`, otherwise returns the colorbar handle.
 
     Raises
     ------
-    AssertionError
+    ValueError
         If `centering` is not 'edge' or 'center', or if `cbar_pos` is not one of 'left', 'right', 'top', or 'bottom'.
-
     """
     from mpl_toolkits.axes_grid1 import make_axes_locatable
     import matplotlib.pyplot as plt
 
-    assert centering in ["edge", "center"], "invalid `centering`"
-    assert cbar_pos in ["left", "right", "top", "bottom"], "invalid `cbar_pos`"
+    if centering not in ["edge", "center"]:
+        raise ValueError("invalid `centering` value: must be 'edge' or 'center'")
+    if cbar_pos not in ["left", "right", "top", "bottom"]:
+        raise ValueError(
+            "invalid `cbar_pos` value: must be 'left', 'right', 'top', or 'bottom'"
+        )
 
     x, y, zz = __checkDimensions2d(x, y, zz)
     ax.grid(False)
@@ -410,7 +541,10 @@ def plotVectorField(
     cbar_pad: float = 0.05,
     **kwargs,
 ):
-    """Add a 2D plot with a vector-field overplotted
+    """Add a 2D plot with a vector-field overlay.
+
+    Uses line integral convolution (LIC) to render the vector field as a
+    semi-transparent texture on top of a scalar image background.
 
     Args
     ----
@@ -422,7 +556,6 @@ def plotVectorField(
         2D arrays of the vector field components.
     background : NDArray | None, optional
         2D array of the image background (None = `sqrt(fx^2 + fy^2)`).
-
     texture_seed : int | None, optional
         Specify a random seed to generate textures, useful when rendering movies (None = random).
     kernel_len : int, optional
@@ -430,39 +563,38 @@ def plotVectorField(
     kernel_pow : int, optional
         Kernel sharpness for the LIC algorithm (default is 1).
     lic_alphamin : float, optional
+        LIC parameter for minimum visible alpha (default is 0.5).
+    lic_alphamax : float, optional
+        LIC parameter for fully opaque alpha (default is 0.75).
+    lic_contrast : float, optional
+        LIC texture contrast exponent (default is 0.33).
+    lic_opacity : float, optional
+        Overall opacity of the LIC overlay (default is 0.75).
+    lic_cmap : str, optional
+        Colormap used for the LIC texture (default is 'binary_r').
+    force_aspect : bool, optional
+        Force equal aspect ratio according to axes (default is True).
+    centering : str, optional
+        Centering of x & y nodes for the data ('edge', 'center') (default is 'edge').
+    xlim : tuple[float, float] | None, optional
+        Tuple of x limits (None = determine from x) (default is None).
+    ylim : tuple[float, float] | None, optional
+        Tuple of y limits (None = determine from y) (default is None).
+    padx : float, optional
+        Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
+    pady : float, optional
+        Add whitespace to axes in each direction (0 = no additional space) (default is 0.0).
+    cbar : str | None, optional
+        Size of the colorbar in percent of x-axis (None = no colorbar) (default is '5%').
+    cbar_pad : float, optional
+        Padding of the colorbar (default is 0.05).
+    **kwargs : dict, optional
+        Standard matplotlib kwargs passed to the background `ax.imshow`.
 
-    """
-
-    """
-    add a 2d plot with a vector-field overplotted
-
-    args
-    ----------
-    ax .......................... : matplotlib axis object
-    x, y ........................ : 1d or 2d arrays of coordinates
-    fx, fy ...................... : 2d arrays of the vector field components
-    background [None] ........... : 2d array of the image background (None = `sqrt(fx^2 + fy^2)`)
-
-    line integral convolution (lic) parameters
-    ---------
-    texture_seed [None] ......... : specify a random seed to generate textures, useful when rendering movies (None = random)
-    kernel_len [31] ............. : kernel resolution for the lic algorithm
-    kernel_pow [1] .............. : kernel sharpness for the lic algorithm
-    lic_alphamin [0.5] .......... : lic parameter for min transparency
-    lic_alphamax [0.75] ......... : lic parameter for max transparency
-    lic_contrast [0.33] ......... : lic parameter for the contrast
-    lic_opacity [0.75] .......... : lic parameter for the absolute opacity of the field plot
-    lic_cmap ['binary_r'] ....... : colormap used for the lic texture
-
-    the rest of the args are the same as for the `plot2d`
-    ----------
-    force_aspect [True] ......... : force equal aspect ratio according to axes
-    centering ['edge'] .......... : centering of x & y nodes for the data ('edge', 'center')
-    xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from x & y)
-    padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
-    cbar ['5%'] ................. : size of the colorbar in percent of x-axis (None = no colorbar)
-    cbar_pad [0.05] ............. : padding of the colorbar
-    **kwargs .................... : standard matplotlib kwargs passed to `ax.imshow`
+    Returns
+    -------
+    Colorbar | None
+        Returns `None` if `cbar` is `None`, otherwise returns the background colorbar handle.
     """
     import myplotlib.tools.lic as lic
     import matplotlib
@@ -524,14 +656,139 @@ def plotVectorField(
         ylim=ylim,
         padx=padx,
         pady=pady,
-        cbar=cbar,
-        cbar_pad=cbar_pad,
+        cbar=None,
         alpha=lic_opacity,
     )
     return colorbar
 
 
+def hatchedCircle(
+    ax: pltAxes,
+    center: Tuple[float, float],
+    radius: float,
+    angle: float = 45.0,
+    spacing: float = 0.12,
+    shade_from: Union[float, None] = None,
+    shade_depth: float = 0.75,
+    crosshatch: bool = False,
+    edge: bool = True,
+    color: Union[str, Tuple[float, float, float, float], None] = None,
+    linewidth: Union[float, None] = None,
+    **kwargs,
+):
+    """Draw a circle shaded with engraving-style hatching
+
+    Mimics the hatched shading of renaissance-era book illustrations
+    (best combined with the `guttenberg` style, which makes the strokes
+    imperfect via `path.sketch`). By default the whole disk is hatched;
+    passing `shade_from` hatches only the crescent-shaped shadow opposite
+    the light, as on woodcut drawings of moon phases.
+
+    Args
+    ----
+    ax : pltAxes
+        The matplotlib axis object (use `ax.set_aspect('equal')` to keep the circle round).
+    center : tuple[float, float]
+        The center of the circle in data coordinates.
+    radius : float
+        The radius of the circle in data coordinates.
+    angle : float, optional
+        Angle of the hatch lines in degrees (default is 45).
+    spacing : float, optional
+        Distance between hatch lines as a fraction of the radius (default is 0.12).
+    shade_from : float | None, optional
+        Direction the light comes from, in degrees (None = hatch the full disk) (default is None).
+    shade_depth : float, optional
+        How deep the shadow crescent cuts into the disk, from 0 (no shadow)
+        to 2 (full disk); only used with `shade_from` (default is 0.75).
+    crosshatch : bool, optional
+        Add a second family of hatch lines perpendicular to the first (default is False).
+    edge : bool, optional
+        Draw the circle outline (default is True).
+    color : str | tuple[float, float, float, float] | None, optional
+        Ink color for the hatching and the outline (None = default line color) (default is None).
+    linewidth : float | None, optional
+        Width of the hatch lines and the outline (None = default line width) (default is None).
+    **kwargs : dict, optional
+        Standard matplotlib kwargs passed to the hatch `LineCollection`.
+
+    Returns
+    -------
+    tuple[Circle | None, LineCollection]
+        The outline patch (None if `edge=False`) and the hatch line collection.
+    """
+    import matplotlib as mpl
+    from matplotlib.collections import LineCollection
+    from matplotlib.patches import Circle
+
+    if color is None:
+        color = mcolors.to_rgba(mpl.rcParams["lines.color"])
+    if linewidth is None:
+        linewidth = mpl.rcParams["lines.linewidth"]
+
+    c = np.asarray(center, dtype=float)
+    angles = [angle, angle + 90.0] if crosshatch else [angle]
+    if shade_from is not None:
+        phi = np.deg2rad(shade_from)
+        lit_center = c + shade_depth * radius * np.array([np.cos(phi), np.sin(phi)])
+
+    segments = []
+    for ang in angles:
+        theta = np.deg2rad(ang)
+        along = np.array([np.cos(theta), np.sin(theta)])
+        normal = np.array([-np.sin(theta), np.cos(theta)])
+        step = spacing * radius
+        for s in np.arange(-radius + 0.5 * step, radius, step):
+            half = np.sqrt(radius**2 - s**2)
+            p0 = c + s * normal
+            intervals = [(-half, half)]
+            if shade_from is not None:
+                # cut out the chord overlap with the lit circle (same radius,
+                # displaced towards the light); what remains is the shadow
+                m = p0 - lit_center
+                b = np.dot(m, along)
+                disc = b**2 - (np.dot(m, m) - radius**2)
+                if disc > 0:
+                    t1, t2 = -b - np.sqrt(disc), -b + np.sqrt(disc)
+                    intervals = [
+                        (a1, a2)
+                        for a1, a2 in [(-half, min(t1, half)), (max(t2, -half), half)]
+                        if a2 > a1
+                    ]
+            for a1, a2 in intervals:
+                if a2 - a1 > 1e-3 * radius:
+                    segments.append([p0 + a1 * along, p0 + a2 * along])
+
+    hatches = LineCollection(
+        segments, colors=color, linewidths=linewidth, capstyle="round", **kwargs
+    )
+    ax.add_collection(hatches)
+    outline = None
+    if edge:
+        outline = Circle(
+            tuple(c), radius, facecolor="none", edgecolor=color, linewidth=linewidth
+        )
+        ax.add_patch(outline)
+    ax.update_datalim([c - radius, c + radius])
+    ax.autoscale_view()
+    return (outline, hatches)
+
+
 class PanelDict(TypedDict):
+    """Describe one panel in a `plot2dGrid` layout.
+
+    Attributes
+    ----------
+    label : str | None
+        Label for the panel.
+    field : Callable | None
+        Function that accepts the `fields` dictionary and returns the plotted array.
+    cmap : str | None
+        Colormap for the panel.
+    norm : matplotlib.colors.Normalize | None
+        Normalization object for the panel.
+    """
+
     label: Union[str, None]
     field: Union[Callable, None]
     cmap: Union[str, None]
@@ -544,58 +801,65 @@ def plot2dGrid(
     fields: dict[str, np.ndarray],
     panels: list[list[PanelDict]],
     label_pos: str = "title",
-    label_args: dict[str, Any] = {},
+    label_args: Union[dict[str, Any], None] = None,
     width: float = 10,
     dpi: int = 150,
     wspace: float = 0.05,
     hspace: float = 0.05,
     **kwargs,
 ):
-    """
-    add a grid of 2d plots with shared axes
+    """Add a grid of 2D plots with shared axes.
 
-    args
-    ----------
-    x, y ........................ : 1d or 2d arrays of coordinates
-    fields ...................... : dictionary of all the fields
-    panels ...................... : array of array of dictionaries indicating the panels to plot (see note below)
-    label_pos ['title'] ......... : position of the label ('title', 'cbar', 'text', None)
-    label_args [{}] ............. : arguments for the label (color, fontsize, etc; passed to `ax.set_title`, )
+    Args
+    ----
+    x, y : NDArray
+        1D or 2D coordinate arrays.
+    fields : dict[str, np.ndarray]
+        Dictionary of all available fields.
+    panels : list[list[PanelDict]]
+        Rectangular grid of panel dictionaries. Each panel supplies a `field`
+        callable and optional `label`, `cmap`, and `norm` values.
+    label_pos : str, optional
+        Position of the label ('title', 'cbar', 'text', None) (default is 'title').
+    label_args : dict[str, Any] | None, optional
+        Arguments passed to `ax.set_title`, `cbar.set_label`, or `ax.text`
+        (None = use no extra label args) (default is None).
+        For `label_pos='text'`, a `position` entry sets axes-relative text coordinates.
+    width : float, optional
+        Width of the figure in inches (default is 10).
+    dpi : int, optional
+        Figure resolution in dots per inch (default is 150).
+    wspace : float, optional
+        Width space between panels as a fraction of panel width (default is 0.05).
+    hspace : float, optional
+        Height space between panels as a fraction of panel height (default is 0.05).
+    **kwargs : dict, optional
+        Standard `plot2d` kwargs such as `force_aspect`, `centering`, `xlim`,
+        `ylim`, `padx`, `pady`, `cbar`, and `cbar_pad`.
 
-    arguments for the figure
-    ----------
-    width [10] .................. : width of the figure in inches
-    dpi [150] ................... : resolution of the figure [dots per inch]
-    wspace [0.05] ............... : width space between the panels (as fraction of the panel width)
-    hspace [0.05] ............... : height space between the panels (as fraction of the panel height)
+    Returns
+    -------
+    tuple[Figure, list[list[pltAxes]]]
+        The created figure and nested list of axes.
 
-    the rest of the args are the same as for the `plot2d`
-    ----------
-    force_aspect [True] ......... : force equal aspect ratio according to axes
-    centering ['edge'] .......... : centering of x & y nodes for the data ('edge', 'center')
-    xlim [None], ylim [None] .... : tuples of x and y limits (None = determine from x & y)
-    padx [0], pady [0] .......... : add whitespace to axes in each direction (0 = no additional space)
-    cbar ['5%'] ................. : size of the colorbar in percent of x-axis (None = no colorbar)
-    cbar_pad [0.05] ............. : padding of the colorbar
-    **kwargs .................... : standard matplotlib kwargs passed to `ax.imshow`
-
-    note
-    ----------
-    the `panels` is an `n x m` array, where `n` is the number of rows and `m` is the number of columns.
-    each element of the array is a dictionary with the following keys:
-        - 'label' ............... : label for the field
-        - 'field' ............... : lambda function which takes the `fields` dictionary and returns the quantity to plot
-        - 'cmap' ................ : colormap of the panel
-        - 'norm' ................ : normalization object
+    Raises
+    ------
+    ValueError
+        If `panels` is empty, non-rectangular, missing required keys, or has an
+        invalid `label_pos`.
     """
     import matplotlib.pyplot as plt
 
-    assert len(panels) > 0, "no panels to plot"
-    assert len(panels[0]) > 0, "no panels to plot"
-    assert all([len(row) == len(panels[0]) for row in panels]), (
-        "all rows must have the same number of panels"
-    )
-    assert label_pos in ["title", "cbar", "text", None], "invalid label position"
+    if len(panels) == 0:
+        raise ValueError("no panels to plot")
+    if len(panels[0]) == 0:
+        raise ValueError("no panels to plot")
+    if not all([len(row) == len(panels[0]) for row in panels]):
+        raise ValueError("all rows must have the same number of panels")
+    if label_pos not in ["title", "cbar", "text", None]:
+        raise ValueError("invalid label position")
+
+    label_args = {} if label_args is None else dict(label_args)
 
     ncols = len(panels[0])
     nrows = len(panels)
@@ -620,16 +884,20 @@ def plot2dGrid(
         for j in range(ncols):
             ax = axs[i][j]
             panel = panels[i][j]
-            assert "field" in panel, "panel must have a 'field' key"
+            if "field" not in panel:
+                raise ValueError("panel must have a 'field' key")
             field_func = panel["field"]
-            assert field_func is not None, "field must be a callable function"
+            if field_func is None:
+                raise ValueError("field must be a callable function")
+            if not callable(field_func):
+                raise TypeError("field must be a callable function")
             cbar = plot2d(
                 ax,
                 x,
                 y,
                 field_func(fields),
-                norm=panel["norm"],
-                cmap=panel["cmap"],
+                norm=panel.get("norm"),
+                cmap=panel.get("cmap"),
                 **kwargs,
             )
 
@@ -639,16 +907,19 @@ def plot2dGrid(
                 ax.set(xlabel=None, xticklabels=[])
 
             if label_pos == "title":
-                assert "label" in panel, "panel must have a 'label' key"
+                if "label" not in panel:
+                    raise ValueError("panel must have a 'label' key")
                 if panel["label"] is not None:
                     ax.set_title(panel["label"], **label_args)
             elif label_pos == "cbar":
                 if cbar is not None:
-                    assert "label" in panel, "panel must have a 'label' key"
+                    if "label" not in panel:
+                        raise ValueError("panel must have a 'label' key")
                     if panel["label"] is not None:
                         cbar.set_label(panel["label"], **label_args)
             elif label_pos == "text":
-                assert "label" in panel, "panel must have a 'label' key"
+                if "label" not in panel:
+                    raise ValueError("panel must have a 'label' key")
                 if panel["label"] is not None:
                     ax.text(
                         *label_coords,
@@ -656,3 +927,5 @@ def plot2dGrid(
                         transform=ax.transAxes,
                         **label_args,
                     )
+
+    return (fig, axs)

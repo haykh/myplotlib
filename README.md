@@ -21,6 +21,7 @@ plt.style.use(STYLE)
 # - fancy.dark, fancy.light
 # - classic.dark, classic.light
 # - mono.dark, mono.light
+# - guttenberg.dark, guttenberg.light
 # - latex
 
 # you may also combine the styles:
@@ -45,6 +46,16 @@ myplt.plot2d?
 import myplotlib.tests as mypltest
 # type for docstring:
 mypltest?
+```
+
+the `guttenberg` styles mimic renaissance-era book illustrations: old-style lettering (IM Fell, with EB Garamond as fallback for greek/cyrillic), imperfect hand-drawn lines, and a single-ink line cycle. they pair well with `myplt.hatchedCircle`, which shades circles with engraving-style hatching (optionally only the crescent shadow, as on old drawings of moon phases):
+
+```python
+with plt.style.context("guttenberg.light"):
+    fig, ax = plt.subplots()
+    ax.set_aspect("equal")
+    myplt.hatchedCircle(ax, (0, 0), 1, angle=45, spacing=0.15)
+    myplt.hatchedCircle(ax, (2.5, 0), 1, shade_from=0, shade_depth=0.8)
 ```
 
 for more usage examples checkout the `tests/` submodule.

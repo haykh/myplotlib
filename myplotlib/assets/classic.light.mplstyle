@@ -26,9 +26,6 @@ legend.frameon: False
 savefig.bbox: tight
 savefig.pad_inches: 0.05
 
-#axes.labelweight  : normal
-axes.labelsize: 14
-
 grid.alpha: 0.2
 
 # tex
@@ -36,7 +33,6 @@ text.usetex: False
 
 # fonts
 font.weight: 500
-font.size: 16
 
 font.serif: AVHershey Complex 
 font.sans-serif: AVHershey Duplex 

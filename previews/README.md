@@ -1,32 +1,40 @@
-# `classic.light`
-
-![classic_light](classic_light.png)
-
-# `fancy.light`
-
-![fancy_light](fancy_light.png)
-
 # `classic.dark`
 
 ![classic_dark](classic_dark.png)
 
-# `mono.light`
+# `classic.light`
 
-![mono_light](mono_light.png)
+![classic_light](classic_light.png)
 
 # `fancy.dark`
 
 ![fancy_dark](fancy_dark.png)
 
+# `fancy.light`
+
+![fancy_light](fancy_light.png)
+
+# `guttenberg.dark`
+
+![guttenberg_dark](guttenberg_dark.png)
+
+# `guttenberg.light`
+
+![guttenberg_light](guttenberg_light.png)
+
+# `latex`
+
+![latex](latex.png)
+
 # `mono.dark`
 
 ![mono_dark](mono_dark.png)
 
-# `Latex`
+# `mono.light`
 
-![Latex](latex.png)
+![mono_light](mono_light.png)
 
-# `Plain`
+# `plain`
 
-![Plain](plain.png)
+![plain](plain.png)
 

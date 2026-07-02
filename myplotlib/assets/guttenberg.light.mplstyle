@@ -1,0 +1,58 @@
+# guttenberg.light: renaissance-era book illustration style
+# black ink on paper, imperfect hand-drawn lines, old-style lettering
+
+# ink & paper
+figure.facecolor: ffffff
+axes.facecolor: ffffff
+savefig.facecolor: ffffff
+text.color: 191411
+axes.edgecolor: 191411
+axes.labelcolor: 191411
+xtick.color: 191411
+ytick.color: 191411
+
+# single-ink cycle: fresh & faded ink, then engraving line styles
+axes.prop_cycle: cycler('linestyle', ['-', '--', ':', '-.']) * cycler('color', ['191411', '6f645a'])
+
+# the hand of the engraver: (scale, length, randomness)
+path.sketch: (1.5, 200, 2)
+
+lines.linewidth: 1.4
+lines.solid_capstyle: round
+lines.dash_capstyle: round
+
+axes.linewidth: 1.0
+axes.grid: False
+axes.axisbelow: True
+axes.spines.top: False
+axes.spines.right: False
+axes.unicode_minus: False
+
+xtick.direction: out
+ytick.direction: out
+
+legend.frameon: False
+
+# continuous tone rendered as ink wash
+image.cmap: binary
+
+text.usetex: False
+font.family: P22OperinaProPatched, EB Garamond
+font.style: normal
+font.weight: normal
+font.serif: P22OperinaProPatched, EB Garamond
+font.sans-serif: P22OperinaProPatched, EB Garamond
+font.monospace: P22OperinaProPatched, EB Garamond
+axes.titleweight: normal
+figure.titleweight: normal
+
+# mathtext does not support eb garamond as a custom per-glyph fallback
+mathtext.fontset: custom
+mathtext.fallback: None
+mathtext.default: it
+mathtext.rm: P22OperinaProPatched:style=normal:weight=normal
+mathtext.it: P22OperinaProPatched:style=normal:weight=normal
+mathtext.bf: P22OperinaProPatched:style=normal:weight=normal
+mathtext.sf: P22OperinaProPatched:style=normal:weight=normal
+mathtext.tt: P22OperinaProPatched:style=normal:weight=normal
+mathtext.cal: P22OperinaProPatched:style=normal:weight=normal

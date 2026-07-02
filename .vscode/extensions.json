@@ -3,6 +3,8 @@
     "tamasfe.even-better-toml",
     "yy0931.mplstyle",
     "charliermarsh.ruff",
-    "ms-python.python"
+    "ms-python.python",
+    "github.vscode-github-actions",
+    "pfwobcke.vscode-ttf"
   ]
 }
