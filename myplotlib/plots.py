@@ -12,13 +12,14 @@ a collection of handy plotting functions bound around `matplotlib` with lots of 
 docstrings are available for all of the functions. type, e.g., `dataPlot?` to read about the arguments passed.
 """
 
-from typing import TypeAlias, Any, TypedDict, Callable
+from typing import TypeAlias, Any, TypedDict, Callable, Union, Tuple
 import numpy as np
+from numpy.typing import NDArray
 import matplotlib.colors as mcolors
 from matplotlib.axes._axes import Axes as pltAxes
 
-LimTypeWithNone: TypeAlias = tuple[float | None, float | None] | None
-LimType: TypeAlias = tuple[float, float]
+LimTypeWithNone: TypeAlias = Union[Tuple[Union[float, None], Union[float, None]], None]
+LimType: TypeAlias = Tuple[float, float]
 
 
 def __stretch(
@@ -34,14 +35,14 @@ def __stretch(
 
 def __setMinMax(
     lims: LimTypeWithNone,
-    data: np.ndarray,
+    data: Union[NDArray, list],
 ) -> LimType:
     """set the limits of the axis according to the data and the passed limits"""
     if lims is None:
         return (np.nanmin(data), np.nanmax(data))
-    assert (
-        isinstance(lims, tuple) and len(lims) == 2
-    ), "lims must be a tuple of length 2"
+    assert isinstance(lims, tuple) and len(lims) == 2, (
+        "lims must be a tuple of length 2"
+    )
     if lims[0] is None and lims[1] is None:
         return (np.nanmin(data), np.nanmax(data))
     if lims[0] is None and lims[1] is not None:
@@ -54,7 +55,7 @@ def __setMinMax(
 
 def __setAxLims(
     ax: pltAxes,
-    coords,
+    coords: Union[NDArray, list],
     log: bool,
     pad: float,
     lims: LimTypeWithNone,
@@ -87,9 +88,9 @@ def __setAxLims(
 
 
 def __checkDimensions2d(
-    x: np.ndarray,
-    y: np.ndarray,
-    zz: np.ndarray,
+    x: NDArray,
+    y: NDArray,
+    zz: NDArray,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """check the dimensions of the passed 2d arrays and return them as 1d arrays"""
     x, y, zz = (
@@ -98,9 +99,9 @@ def __checkDimensions2d(
         np.array(np.squeeze(zz)),
     )
     readShapes = f"`x.shape={x.shape}`, `y.shape={y.shape}`, `zz.shape={zz.shape}`"
-    assert len(x.shape) == len(
-        y.shape
-    ), f"Shapes of `x` and `y` must be of the same dimension: {readShapes}."
+    assert len(x.shape) == len(y.shape), (
+        f"Shapes of `x` and `y` must be of the same dimension: {readShapes}."
+    )
     if len(x.shape) > 1:
         x = x[0, ...]
     if len(y.shape) > 1:
@@ -108,18 +109,18 @@ def __checkDimensions2d(
     assert (len(zz.shape) == 2) or (
         len(zz.shape) == 3 and ((zz.shape[-1] == 3) or (zz.shape[-1] == 4))
     ), f"`zz` must have exactly 2 non-trivial axes: {readShapes}."
-    assert (
-        zz.shape[1] == x.shape[0]
-    ), f"incompatible dimensions between `x` and `zz`: {readShapes}."
-    assert (
-        zz.shape[0] == y.shape[0]
-    ), f"incompatible dimensions between `y` and `zz`: {readShapes}."
+    assert zz.shape[1] == x.shape[0], (
+        f"incompatible dimensions between `x` and `zz`: {readShapes}."
+    )
+    assert zz.shape[0] == y.shape[0], (
+        f"incompatible dimensions between `y` and `zz`: {readShapes}."
+    )
     return (x, y, zz)
 
 
 def __findExtent(
-    x: np.ndarray,
-    y: np.ndarray,
+    x: NDArray,
+    y: NDArray,
     centering: str,
 ) -> tuple[float, float, float, float]:
     if centering == "edge":
@@ -143,8 +144,8 @@ def __findExtent(
 def dataPlot(
     function: Callable,
     ax: pltAxes,
-    x: np.ndarray,
-    y: np.ndarray,
+    x: NDArray,
+    y: NDArray,
     xlog: bool = False,
     ylog: bool = False,
     xlim: LimTypeWithNone = None,
@@ -161,7 +162,7 @@ def dataPlot(
         The function to call on the axis (e.g., `ax.plot`, `ax.scatter`).
     ax : pltAxes
         The matplotlib axis object.
-    x, y : np.ndarray
+    x, y : NDArray
         The data to plot.
     xlog : bool, optional
         Use logarithmic scale for x-axis (default is False).
@@ -190,8 +191,8 @@ def dataPlot(
 
 def scatter(
     ax: pltAxes,
-    x: np.ndarray,
-    y: np.ndarray,
+    x: NDArray,
+    y: NDArray,
     xlog: bool = False,
     ylog: bool = False,
     xlim: LimTypeWithNone = None,
@@ -206,7 +207,7 @@ def scatter(
     ----
     ax : pltAxes
         The matplotlib axis object.
-    x, y : np.ndarray
+    x, y : NDArray
         The data to plot.
     xlog : bool, optional
         Use logarithmic scale for x-axis (default is False).
@@ -228,8 +229,8 @@ def scatter(
 
 def plot(
     ax: pltAxes,
-    x: np.ndarray,
-    y: np.ndarray,
+    x: NDArray,
+    y: NDArray,
     xlog: bool = False,
     ylog: bool = False,
     xlim: LimTypeWithNone = None,
@@ -244,7 +245,7 @@ def plot(
     ----
     ax : pltAxes
         The matplotlib axis object.
-    x, y : np.ndarray
+    x, y : NDArray
         The data to plot.
     xlog : bool, optional
         Use logarithmic scale for x-axis (default is False).
@@ -266,9 +267,9 @@ def plot(
 
 def plot2d(
     ax: pltAxes,
-    x: np.ndarray,
-    y: np.ndarray,
-    zz: np.ndarray,
+    x: NDArray,
+    y: NDArray,
+    zz: NDArray,
     force_aspect: bool = True,
     centering: str = "edge",
     xlim: LimTypeWithNone = None,
@@ -277,7 +278,7 @@ def plot2d(
     zlim: LimTypeWithNone = None,
     padx: float = 0.0,
     pady: float = 0.0,
-    cbar: str | None = "5%",
+    cbar: Union[str, None] = "5%",
     cbar_pad: float = 0.05,
     cbar_pos: str = "right",
     **kwargs,
@@ -336,7 +337,7 @@ def plot2d(
     ax.grid(False)
     extent = __findExtent(x, y, centering)
     aspect = "auto" if not force_aspect else None
-    if not ("norm" in kwargs):
+    if "norm" not in kwargs:
         zminQ = np.quantile(zz[~np.isnan(zz) & ~np.isinf(zz)], 0.05)
         zmaxQ = np.quantile(zz[~np.isnan(zz) & ~np.isinf(zz)], 0.95)
         if zlim is not None:
@@ -386,12 +387,12 @@ def plot2d(
 
 def plotVectorField(
     ax: pltAxes,
-    x: np.ndarray,
-    y: np.ndarray,
-    fx: np.ndarray,
-    fy: np.ndarray,
-    background: np.ndarray | None = None,
-    texture_seed: int | None = None,
+    x: NDArray,
+    y: NDArray,
+    fx: NDArray,
+    fy: NDArray,
+    background: Union[NDArray, None] = None,
+    texture_seed: Union[int, None] = None,
     kernel_len: int = 31,
     kernel_pow: int = 1,
     lic_alphamin: float = 0.5,
@@ -401,27 +402,27 @@ def plotVectorField(
     lic_cmap: str = "binary_r",
     force_aspect: bool = True,
     centering: str = "edge",
-    xlim: tuple[float, float] | None = None,
-    ylim: tuple[float, float] | None = None,
+    xlim: Union[Tuple[float, float], None] = None,
+    ylim: Union[Tuple[float, float], None] = None,
     padx: float = 0.0,
     pady: float = 0.0,
-    cbar: str | None = "5%",
+    cbar: Union[str, None] = "5%",
     cbar_pad: float = 0.05,
     **kwargs,
 ):
     """Add a 2D plot with a vector-field overplotted
-    
+
     Args
     ----
     ax : pltAxes
         The matplotlib axis object.
-    x, y : np.ndarray
+    x, y : NDArray
         1D or 2D arrays of coordinates.
-    fx, fy : np.ndarray
+    fx, fy : NDArray
         2D arrays of the vector field components.
-    background : np.ndarray | None, optional
+    background : NDArray | None, optional
         2D array of the image background (None = `sqrt(fx^2 + fy^2)`).
-    
+
     texture_seed : int | None, optional
         Specify a random seed to generate textures, useful when rendering movies (None = random).
     kernel_len : int, optional
@@ -429,9 +430,9 @@ def plotVectorField(
     kernel_pow : int, optional
         Kernel sharpness for the LIC algorithm (default is 1).
     lic_alphamin : float, optional
-            
+
     """
-    
+
     """
     add a 2d plot with a vector-field overplotted
 
@@ -465,7 +466,6 @@ def plotVectorField(
     """
     import myplotlib.tools.lic as lic
     import matplotlib
-    import matplotlib.pyplot as plt
 
     kernel = lic.generate_kernel(kernel_len) ** kernel_pow
     x, y, fx = __checkDimensions2d(x, y, fx)
@@ -532,15 +532,15 @@ def plotVectorField(
 
 
 class PanelDict(TypedDict):
-    label: str | None
-    field: Callable | None
-    cmap: str | None
-    norm: mcolors.Normalize | None
+    label: Union[str, None]
+    field: Union[Callable, None]
+    cmap: Union[str, None]
+    norm: Union[mcolors.Normalize, None]
 
 
 def plot2dGrid(
-    x: np.ndarray,
-    y: np.ndarray,
+    x: NDArray,
+    y: NDArray,
     fields: dict[str, np.ndarray],
     panels: list[list[PanelDict]],
     label_pos: str = "title",
@@ -592,9 +592,9 @@ def plot2dGrid(
 
     assert len(panels) > 0, "no panels to plot"
     assert len(panels[0]) > 0, "no panels to plot"
-    assert all(
-        [len(row) == len(panels[0]) for row in panels]
-    ), "all rows must have the same number of panels"
+    assert all([len(row) == len(panels[0]) for row in panels]), (
+        "all rows must have the same number of panels"
+    )
     assert label_pos in ["title", "cbar", "text", None], "invalid label position"
 
     ncols = len(panels[0])
