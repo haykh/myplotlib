@@ -2,6 +2,7 @@
   "[toml]": {
     "editor.defaultFormatter": "tamasfe.even-better-toml"
   },
+  "python.analysis.typeCheckingMode": "basic",
   "evenBetterToml.taplo.configFile.enabled": true,
   "evenBetterToml.taplo.configFile.path": ".taplo.toml",
 }

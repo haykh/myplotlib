@@ -1,2 +1,5 @@
 text.usetex: True
 text.latex.preamble: \usepackage{amsmath,bm,xcolor}
+
+# render all text with the serif (computer modern roman) family, as in a latex document
+font.family: serif

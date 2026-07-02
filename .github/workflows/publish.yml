@@ -1,0 +1,54 @@
+name: publish to PyPI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Check version matches the release tag
+        run: |
+          PKG_VERSION=$(grep -oP '__version__ = "\K[^"]+' myplotlib/__init__.py)
+          TAG="${{ github.event.release.tag_name }}"
+          TAG="${TAG#v}"   # allow tags like v0.1.0
+          if [ "$PKG_VERSION" != "$TAG" ]; then
+            echo "::error::package version ($PKG_VERSION) != release tag ($TAG)"
+            exit 1
+          fi
+
+      - name: Build sdist and wheel
+        run: uv build
+
+      - name: Smoke-test the wheel
+        run: |
+          uv venv smoketest
+          VIRTUAL_ENV=$PWD/smoketest uv pip install dist/*.whl
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/myplotlib
+    permissions:
+      id-token: write   # required for PyPI Trusted Publishing (OIDC)
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
