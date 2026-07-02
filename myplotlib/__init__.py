@@ -78,9 +78,10 @@ def __InstallCmapFromCSV(csv):
     import matplotlib as mpl
 
     cmap = os.path.splitext(os.path.basename(csv))[0]
+    if cmap not in CUSTOM_CMAPS:
+        CUSTOM_CMAPS.append(cmap)
     cmap_data = np.loadtxt(csv, delimiter=",")
     if cmap not in mpl.colormaps.keys():
-        CUSTOM_CMAPS.append(cmap)
         mpl_data = __RGBToPyCmap(cmap_data)
         mpl.colormaps.register(
             cmap=mcolors.LinearSegmentedColormap(cmap, mpl_data, cmap_data.shape[0])
@@ -156,10 +157,33 @@ def __RegisterFonts(font_dir):
 
 myplotlib_path = str(Path(__file__).resolve().parent)
 styles_path = str(Path(myplotlib_path) / "assets")
-__RegisterStyles(styles_path)
 
 CMAP_DIR = str(Path(myplotlib_path) / "assets" / "colormaps")
-CMAPS = __RegisterColormaps(CMAP_DIR)
+CMAPS = []
 
 FONT_DIR = str(Path(myplotlib_path) / "assets" / "fonts")
-font_files = __RegisterFonts(FONT_DIR)
+font_files = []
+
+_ASSETS_REGISTERED = False
+
+
+def register():
+    """Register bundled Matplotlib assets.
+
+    Returns
+    -------
+    None
+        Styles, colormaps, and fonts are registered with Matplotlib in place.
+    """
+    global CMAPS, font_files, _ASSETS_REGISTERED
+
+    if _ASSETS_REGISTERED:
+        return
+
+    __RegisterStyles(styles_path)
+    CMAPS = __RegisterColormaps(CMAP_DIR)
+    font_files = __RegisterFonts(FONT_DIR)
+    _ASSETS_REGISTERED = True
+
+
+register()

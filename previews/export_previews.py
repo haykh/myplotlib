@@ -2,7 +2,6 @@ import os
 import logging
 import matplotlib.pyplot as plt
 
-import myplotlib
 import myplotlib.tests as mypltests
 import argparse
 

@@ -13,8 +13,10 @@ pip install myplotlib
 ### loading style, fonts & colormaps
 
 ```python
-import myplotlib
 import matplotlib.pyplot as plt
+from myplotlib import register
+
+register()
 
 plt.style.use(STYLE)
 # STYLE can be:
@@ -32,6 +34,8 @@ with plt.style.context(STYLE):
     plt.plot(...)
 ```
 
+> `register()` loads the bundled styles, fonts, and colormaps into Matplotlib. importing `myplotlib` still registers them for backward compatibility, but the explicit call keeps linters from flagging an unused side-effect import.
+
 ### auxiliary plotting functions
 
 ```python
@@ -48,7 +52,7 @@ import myplotlib.tests as mypltest
 mypltest?
 ```
 
-the `guttenberg` styles mimic renaissance-era book illustrations: old-style lettering (IM Fell, with EB Garamond as fallback for greek/cyrillic), imperfect hand-drawn lines, and a single-ink line cycle. they pair well with `myplt.hatchedCircle`, which shades circles with engraving-style hatching (optionally only the crescent shadow, as on old drawings of moon phases):
+the `guttenberg` styles mimic renaissance-era book illustrations: old-style lettering (P22 Operina Pro, with EB Garamond as fallback for missing glyphs), imperfect hand-drawn lines, and a single-ink line cycle. they pair well with `myplt.hatchedCircle`, which shades circles with engraving-style hatching (optionally only the crescent shadow, as on old drawings of moon phases):
 
 ```python
 with plt.style.context("guttenberg.light"):
@@ -66,20 +70,6 @@ for more usage examples checkout the `tests/` submodule.
 * `matplotlib >= 3.5.0`, `numpy`
 * `latex` (used for `fancy` and `latex` only)
 * `numba>=0.57.0`
-
-## development
-
-when deploying a new version, there are three necessary steps to take.
-
-1. increase the version string in `myplotlib/__init__.py`.
-2. generate the previews:
-    ```sh
-    python3 previews/export_previews.py
-    ```
-3. build the new tarballs in the `dist` directory:
-    ```sh
-    python -m build --sdist --outdir dist .
-    ```
 
 ## To-do
 
