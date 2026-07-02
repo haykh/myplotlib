@@ -4,7 +4,7 @@ Importing `myplotlib` adds package assets to Matplotlib's style library,
 colormap registry, and font manager.
 """
 
-__version__ = "1.8.0"
+__version__ = "1.8.1"
 
 
 import warnings
