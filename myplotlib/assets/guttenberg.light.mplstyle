@@ -15,7 +15,7 @@ ytick.color: 191411
 axes.prop_cycle: cycler('linestyle', ['-', '--', ':', '-.']) * cycler('color', ['191411', '6f645a'])
 
 # the hand of the engraver: (scale, length, randomness)
-path.sketch: (1.5, 200, 2)
+path.sketch: (0.3, 50, 10)
 
 lines.linewidth: 1.4
 lines.solid_capstyle: round
