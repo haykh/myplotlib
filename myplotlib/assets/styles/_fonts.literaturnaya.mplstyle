@@ -1,0 +1,20 @@
+text.usetex: False
+
+font.style: normal
+font.weight: normal
+font.serif: Literaturnaya
+font.sans-serif: Literaturnaya
+font.monospace: Literaturnaya
+
+font.family: serif
+
+mathtext.fontset: custom
+mathtext.fallback: cm
+mathtext.default: it
+mathtext.rm: Literaturnaya:style=normal:weight=normal
+mathtext.it: Literaturnaya:style=italic:weight=normal
+mathtext.bf: Literaturnaya:style=normal:weight=bold
+mathtext.bfit: Literaturnaya:style=italic:weight=bold
+mathtext.sf: Literaturnaya:style=normal:weight=normal
+mathtext.tt: Literaturnaya:style=normal:weight=normal
+mathtext.cal: Literaturnaya:style=italic:weight=normal

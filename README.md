@@ -24,6 +24,7 @@ plt.style.use(STYLE)
 # - classic.dark, classic.light
 # - mono.dark, mono.light
 # - guttenberg.dark, guttenberg.light
+# - soviet
 # - latex
 
 # you may also combine the styles:
@@ -66,10 +67,8 @@ for more usage examples checkout the `tests/` submodule.
 
 ## requirements
 
-* `python >= 3.8`
-* `matplotlib >= 3.5.0`, `numpy`
+* `python >= 3.10`
 * `latex` (used for `fancy` and `latex` only)
-* `numba>=0.57.0`
 
 ## To-do
 

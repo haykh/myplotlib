@@ -4,15 +4,132 @@ Importing `myplotlib` adds package assets to Matplotlib's style library,
 colormap registry, and font manager.
 """
 
-__version__ = "1.8.2"
+__version__ = "1.9.0"
 
 
+import logging
 import warnings
 from pathlib import Path
 from typing import Literal, Sequence, cast
 import matplotlib.pyplot as plt
 from matplotlib import font_manager, rc_params_from_file
 import matplotlib.colors as mcolors
+
+
+myplotlib_path = str(Path(__file__).resolve().parent)
+styles_path = str(Path(myplotlib_path) / "assets" / "styles")
+
+CMAP_DIR = str(Path(myplotlib_path) / "assets" / "colormaps")
+CMAPS = []
+
+FONT_DIR = str(Path(myplotlib_path) / "assets" / "fonts")
+font_files = []
+
+_ASSETS_REGISTERED = False
+
+_STYLE_RECIPES = {
+    "fancy.light": [
+        "_base",
+        "_ticksout.base",
+        "_fonts.garamond",
+        "_palette.fancy.light",
+    ],
+    "fancy.dark": [
+        "_base",
+        "_ticksout.base",
+        "_fonts.garamond",
+        "_palette.fancy.dark",
+        "_theme.fancy.dark",
+    ],
+    "classic.light": [
+        "_base",
+        "_ticksin.base",
+        "_extraticks.base",
+        "_fonts.classic",
+        "_palette.classic.light",
+    ],
+    "classic.dark": [
+        "_base",
+        "_ticksin.base",
+        "_extraticks.base",
+        "_fonts.classic",
+        "_palette.classic.dark",
+        "_theme.classic.dark",
+    ],
+    "mono.light": [
+        "_base",
+        "_ticksout.base",
+        "_fonts.mono",
+        "_palette.mono",
+    ],
+    "mono.dark": [
+        "_base",
+        "_ticksout.base",
+        "_fonts.mono",
+        "_palette.mono",
+        "_theme.mono.dark",
+    ],
+    "guttenberg.light": [
+        "_base",
+        "_ticksout.base",
+        "_fonts.operina",
+        "_style.guttenberg",
+        "_palette.guttenberg.light",
+        "_theme.guttenberg.light",
+    ],
+    "guttenberg.dark": [
+        "_base",
+        "_ticksout.base",
+        "_fonts.operina",
+        "_style.guttenberg",
+        "_palette.guttenberg.dark",
+        "_theme.guttenberg.dark",
+    ],
+    "soviet": [
+        "_base",
+        "_ticksin.base",
+        "_fonts.literaturnaya",
+        "_style.soviet",
+    ],
+    "latex": [
+        "_base",
+        "_style.latex",
+    ],
+}
+
+
+class _MatplotlibNoiseFilter(logging.Filter):
+    """Drop benign Matplotlib font and TeX log spam."""
+
+    _TEXT_SNIPPETS = (
+        "No TeX to Unicode mapping",
+        "No Unicode mapping for",
+        "findfont",
+        "does not have a glyph for",
+    )
+
+    def filter(self, record):
+        message = record.getMessage()
+        return not any(snippet in message for snippet in self._TEXT_SNIPPETS)
+
+
+def _quiet_matplotlib_warnings():
+    """Suppress noisy Matplotlib diagnostics emitted during normal rendering."""
+    noise_filter = _MatplotlibNoiseFilter()
+    for logger_name in (
+        "matplotlib.font_manager",
+        "matplotlib.dviread",
+        "matplotlib.mathtext",
+        "matplotlib.texmanager",
+        "matplotlib.backends.backend_pdf",
+    ):
+        logging.getLogger(logger_name).addFilter(noise_filter)
+
+    warnings.filterwarnings(
+        "ignore",
+        message=r".*(No TeX to Unicode mapping|No Unicode mapping for).*",
+        module=r"matplotlib\..*",
+    )
 
 
 def __RGBToPyCmap(rgbdata):
@@ -94,24 +211,31 @@ def __InstallCmapFromCSV(csv):
         )
 
 
+def __ReadStyle(path):
+    with warnings.catch_warnings(record=True):
+        return rc_params_from_file(path, use_default_template=False)
+
+
 def __RegisterStyles(styles_path):
-    """Register bundled Matplotlib style files.
+    """Register bundled Matplotlib styles and composed style recipes."""
+    styles = {}
 
-    Args
-    ----
-    styles_path : str | Path
-        Directory containing `.mplstyle` files.
+    for path in sorted(Path(styles_path).glob("*.mplstyle")):
+        styles[path.stem] = __ReadStyle(path)
 
-    Returns
-    -------
-    None
-        Style files are registered in Matplotlib in place.
-    """
-    for path in Path(styles_path).rglob("*.mplstyle"):
-        with warnings.catch_warnings(record=True):
-            plt.style.library[path.stem] = rc_params_from_file(
-                path, use_default_template=False
-            )
+    for style_name, recipe in _STYLE_RECIPES.items():
+        composed = {}
+        for part_name in recipe:
+            try:
+                composed.update(styles[part_name])
+            except KeyError as exc:
+                raise KeyError(
+                    f"Style recipe {style_name!r} references missing part {part_name!r}"
+                ) from exc
+
+        styles[style_name] = composed
+
+    plt.style.library.update(styles)
     plt.style.available[:] = sorted(
         name for name in plt.style.library if not name.startswith("_")
     )
@@ -155,18 +279,6 @@ def __RegisterFonts(font_dir):
     return font_files
 
 
-myplotlib_path = str(Path(__file__).resolve().parent)
-styles_path = str(Path(myplotlib_path) / "assets")
-
-CMAP_DIR = str(Path(myplotlib_path) / "assets" / "colormaps")
-CMAPS = []
-
-FONT_DIR = str(Path(myplotlib_path) / "assets" / "fonts")
-font_files = []
-
-_ASSETS_REGISTERED = False
-
-
 def register():
     """Register bundled Matplotlib assets.
 
@@ -186,4 +298,5 @@ def register():
     _ASSETS_REGISTERED = True
 
 
+_quiet_matplotlib_warnings()
 register()

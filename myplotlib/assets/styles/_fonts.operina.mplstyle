@@ -1,0 +1,20 @@
+text.usetex: False
+
+font.family: P22OperinaProPatched, EB Garamond
+font.style: normal
+font.weight: normal
+font.serif: P22OperinaProPatched, EB Garamond
+font.sans-serif: P22OperinaProPatched, EB Garamond
+font.monospace: P22OperinaProPatched, EB Garamond
+axes.titleweight: normal
+figure.titleweight: normal
+
+mathtext.fontset: custom
+mathtext.fallback: stix
+mathtext.default: it
+mathtext.rm: P22OperinaProPatched:style=normal:weight=normal
+mathtext.it: P22OperinaProPatched:style=normal:weight=normal
+mathtext.bf: P22OperinaProPatched:style=normal:weight=normal
+mathtext.sf: P22OperinaProPatched:style=normal:weight=normal
+mathtext.tt: P22OperinaProPatched:style=normal:weight=normal
+mathtext.cal: P22OperinaProPatched:style=normal:weight=normal

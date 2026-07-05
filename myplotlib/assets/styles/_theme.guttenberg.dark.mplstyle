@@ -1,0 +1,8 @@
+figure.facecolor: 14100c
+axes.facecolor: 14100c
+savefig.facecolor: 14100c
+text.color: e8e1d2
+axes.edgecolor: e8e1d2
+axes.labelcolor: e8e1d2
+xtick.color: e8e1d2
+ytick.color: e8e1d2

@@ -1,0 +1,16 @@
+text.usetex: True
+text.latex.preamble: \usepackage{amsmath,bm,xcolor,ebgaramond-maths}
+
+font.serif: EB Garamond
+font.sans-serif: EB Garamond
+font.monospace: EB Garamond
+
+font.family: serif
+
+# mathtext.fontset: custom
+# mathtext.default: it
+# mathtext.rm: EB Garamond
+# mathtext.it: EB Garamond:italic
+# mathtext.bf: EB Garamond:bold
+# mathtext.sf: EB Garamond:medium
+# mathtext.tt: EB Garamond:light
