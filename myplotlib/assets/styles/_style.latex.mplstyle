@@ -1,0 +1,3 @@
+text.usetex: True
+text.latex.preamble: \usepackage{amsmath,bm,xcolor,lmodern}
+font.family: serif

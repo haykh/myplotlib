@@ -1,0 +1,23 @@
+text.usetex: False
+axes.formatter.use_mathtext: True
+
+font.weight: 500
+
+font.serif: AVHershey Complex 
+font.sans-serif: AVHershey Duplex 
+font.monospace: AVHershey Complex 
+
+font.family: serif
+
+mathtext.fontset: custom
+mathtext.default: it
+mathtext.rm: AVHershey Complex:medium
+mathtext.it: AVHershey Complex:medium:italic
+mathtext.bf: AVHershey Complex:heavy
+mathtext.sf: AVHershey Duplex:medium
+mathtext.tt: AVHershey Complex:light
+
+mathtext.fallback: stixsans
+
+ps.fonttype: 42
+pdf.fonttype: 42

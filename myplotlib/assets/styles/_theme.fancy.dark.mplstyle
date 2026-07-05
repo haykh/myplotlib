@@ -1,0 +1,8 @@
+figure.facecolor: 0d1117
+axes.facecolor: none
+axes.edgecolor: white
+axes.labelcolor: white
+xtick.color: white
+ytick.color: white
+patch.edgecolor: white
+text.color: white

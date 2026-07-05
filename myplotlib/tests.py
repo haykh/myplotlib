@@ -121,6 +121,22 @@ def testScatter(ax=None):
         ncol=2,
         frameon=False,
     )
+    ax.text(
+        10,
+        0.1,
+        r"$\zeta(s)\equiv \sum_{n=1}^{\infty} \frac{1}{n^s}$",
+        ha="center",
+        va="center",
+        fontsize=12,
+    )
+    ax.text(
+        10,
+        0.02,
+        r"$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$",
+        ha="center",
+        va="center",
+        fontsize=12,
+    )
     ax.set_xlabel(r"some funny number $x^2/y$ [units]")
     ax.set_ylabel(r"other number $z_{\nu}$ [units]")
 

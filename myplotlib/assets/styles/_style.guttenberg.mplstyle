@@ -1,0 +1,10 @@
+path.sketch: (0.3, 50, 10)
+
+lines.linewidth: 1.4
+lines.solid_capstyle: round
+lines.dash_capstyle: round
+
+axes.spines.top: False
+axes.spines.right: False
+
+axes.linewidth: 1.0

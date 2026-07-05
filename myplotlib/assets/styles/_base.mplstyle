@@ -1,0 +1,5 @@
+figure.dpi: 150
+axes.axisbelow: True
+grid.alpha: 0.2
+grid.linewidth: 0.2
+legend.frameon: False
